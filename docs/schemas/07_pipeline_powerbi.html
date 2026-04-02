@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>7. Pipeline Power BI — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        h2 { color: #333; max-width: 1100px; margin: 30px auto 10px; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1100px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th { background: #1a237e; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
+        tr:hover { background: #f0f0f0; }
+        code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+        .method { max-width: 1100px; margin: 20px auto; background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .badge-csv { background: #43a047; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .badge-api { background: #e65100; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>7. Pipeline de données Power BI</h1>
+
+    <h2>7.1 — Vue d'ensemble du pipeline</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart LR
+    DB[(SQLite3\n9 tables)]
+    DJ[Django ORM\nQuerySets]
+    CSV[Exports CSV\nSession admin]
+    API[API JSON\nClé API]
+    PBI[Power BI Desktop]
+    DASH[Tableaux de bord\nVisualisations]
+
+    DB --> DJ
+    DJ --> CSV
+    DJ --> API
+    CSV -->|Import fichier| PBI
+    API -->|Web connector| PBI
+    PBI --> DASH
+        </pre>
+    </div>
+
+    <h2>7.2 — Méthode 1 : Exports CSV</h2>
+    <div class="method">
+        <p><span class="badge-csv">CSV</span> Nécessite une session admin Django active. Fichiers encodés <strong>UTF-8 BOM</strong> avec séparateur <strong>point-virgule (;)</strong> pour compatibilité Excel/Power BI français.</p>
+        <table>
+            <tr><th>Endpoint</th><th>Description</th><th>Colonnes principales</th></tr>
+            <tr>
+                <td><code>/reporting/export/utilisateurs/</code></td>
+                <td>Liste de tous les utilisateurs</td>
+                <td>Username, Nom, Prénom, Email, Rôle, Formation, Date inscription, Actif</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/export/emargements/</code></td>
+                <td>Feuilles d'émargement</td>
+                <td>Etudiant, Cours, Date, Statut présence, Formation</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/export/chatbot/</code></td>
+                <td>Logs du chatbot</td>
+                <td>Utilisateur, Question, Réponse, Match, Satisfaction, Date</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/export/evenements/</code></td>
+                <td>Événements campus</td>
+                <td>Titre, Organisateur, Date, Lieu, Statut, Nombre inscrits</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>7.3 — Méthode 2 : API JSON</h2>
+    <div class="method">
+        <p><span class="badge-api">API</span> Authentification par clé API passée en query parameter. Pas de session requise.</p>
+        <table>
+            <tr><th>Endpoint</th><th>Paramètre requis</th><th>Format retour</th></tr>
+            <tr>
+                <td><code>/reporting/api/utilisateurs/</code></td>
+                <td><code>?api_key=campus-connect-powerbi-2026</code></td>
+                <td>Array JSON d'objets utilisateur</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/api/emargements/</code></td>
+                <td><code>?api_key=...</code></td>
+                <td>Array JSON d'émargements</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/api/chatbot_logs/</code></td>
+                <td><code>?api_key=...</code></td>
+                <td>Array JSON de logs chatbot</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/api/evenements/</code></td>
+                <td><code>?api_key=...</code></td>
+                <td>Array JSON d'événements</td>
+            </tr>
+            <tr>
+                <td><code>/reporting/api/cours/</code></td>
+                <td><code>?api_key=...</code></td>
+                <td>Array JSON de cours</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>7.4 — Utilisation dans Power BI Desktop</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    subgraph CSV["Méthode CSV"]
+        C1["Power BI > Obtenir les données"]
+        C2["Texte/CSV > Sélectionner fichier"]
+        C3["Délimiteur : point-virgule"]
+        C4["Encodage : UTF-8"]
+        C5["Charger dans le modèle"]
+        C1 --> C2 --> C3 --> C4 --> C5
+    end
+
+    subgraph APIM["Méthode API"]
+        A1["Power BI > Obtenir les données"]
+        A2["Web > URL de déploiement"]
+        A3["Ajouter ?api_key=..."]
+        A4["Convertir JSON en table"]
+        A5["Charger dans le modèle"]
+        A1 --> A2 --> A3 --> A4 --> A5
+    end
+
+    subgraph VISU["Visualisations suggérées"]
+        V1["Assiduité par formation\n(barres empilées)"]
+        V2["Evolution chatbot\n(ligne temporelle)"]
+        V3["Répartition rôles\n(camembert)"]
+        V4["Taux satisfaction\n(jauge KPI)"]
+    end
+
+    CSV --> VISU
+    APIM --> VISU
+        </pre>
+    </div>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

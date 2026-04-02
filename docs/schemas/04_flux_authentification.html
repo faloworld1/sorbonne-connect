@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>4. Flux d'Authentification — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        h2 { color: #333; max-width: 1100px; margin: 30px auto 10px; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1100px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>4. Flux d'Authentification et Contrôle d'Accès</h1>
+
+    <h2>4.1 — Inscription</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+sequenceDiagram
+    actor U as Utilisateur
+    participant B as Navigateur
+    participant V as views.inscription()
+    participant DB as SQLite3
+
+    U->>B: Accède /register/
+    B->>V: GET /register/
+    V->>B: Formulaire InscriptionForm
+    U->>B: Remplit username, email, mdp, rôle, formation
+    B->>V: POST /register/ + CSRF token
+    V->>V: form.is_valid()
+    V->>DB: form.save() — INSERT Utilisateur (mdp hashé)
+    V->>V: login(request, user) — crée session
+    V->>B: redirect /dashboard/
+        </pre>
+    </div>
+
+    <h2>4.2 — Connexion</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+sequenceDiagram
+    actor U as Utilisateur
+    participant B as Navigateur
+    participant V as ConnexionView
+    participant DB as SQLite3
+
+    U->>B: Accède /login/
+    B->>V: GET /login/
+    V->>B: Formulaire ConnexionForm
+    U->>B: Saisit username + password
+    B->>V: POST /login/ + CSRF
+    V->>DB: authenticate(username, password)
+    DB->>V: OK — hash vérifié
+    V->>V: get_success_url() — ?next= ou /dashboard/
+    V->>B: redirect /dashboard/
+        </pre>
+    </div>
+
+    <h2>4.3 — Chaîne de sécurité des vues</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    REQ["Requête entrante"] --> AUTH{"Utilisateur\nauthentifié ?"}
+    AUTH -->|Non| REDIR_LOGIN["Redirect /login/?next=URL"]
+    AUTH -->|Oui| ROLE{"@role_required\nprésent ?"}
+    ROLE -->|Non| VUE_OK["Vue exécutée"]
+    ROLE -->|Oui| CHECK{"user.is_superuser\nOU\nuser.role in roles ?"}
+    CHECK -->|Oui| VUE_OK
+    CHECK -->|Non| REDIR_DASH["Redirect /dashboard/"]
+        </pre>
+    </div>
+
+    <h2>4.4 — Routage du dashboard selon le rôle</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart LR
+    DASH["GET /dashboard/"] --> R{"user.role ?"}
+    R -->|admin_univ ou superuser| DA["dashboard_admin.html"]
+    R -->|enseignant| DE["dashboard_enseignant.html"]
+    R -->|bde| DB2["dashboard_bde.html"]
+    R -->|association| DAS["dashboard_association.html"]
+    R -->|etudiant| DET["dashboard_etudiant.html"]
+        </pre>
+    </div>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

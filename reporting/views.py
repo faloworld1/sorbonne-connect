@@ -352,3 +352,89 @@ def powerbi_utilisateurs(request):
             'actif': u.is_active,
         })
     return JsonResponse(data, safe=False)
+
+
+@powerbi_api_key_required
+def powerbi_associations(request):
+    """JSON — Toutes les associations."""
+    data = []
+    for a in Association.objects.select_related('responsable').prefetch_related('membres').iterator():
+        data.append({
+            'id': a.id,
+            'nom': a.nom,
+            'description': a.description,
+            'responsable': a.responsable.get_full_name(),
+            'nombre_membres': a.membres.count(),
+            'date_creation': a.date_creation.strftime('%Y-%m-%d'),
+            'active': a.active,
+        })
+    return JsonResponse(data, safe=False)
+
+
+@powerbi_api_key_required
+def powerbi_publications(request):
+    """JSON — Toutes les publications."""
+    data = []
+    for p in Publication.objects.select_related('auteur').iterator():
+        data.append({
+            'id': p.id,
+            'titre': p.titre,
+            'contenu': p.contenu[:300],
+            'auteur': p.auteur.get_full_name(),
+            'statut': p.get_statut_display(),
+            'date_creation': p.date_creation.strftime('%Y-%m-%d'),
+            'date_modification': p.date_modification.strftime('%Y-%m-%d'),
+        })
+    return JsonResponse(data, safe=False)
+
+
+@powerbi_api_key_required
+def powerbi_cours(request):
+    """JSON — Tous les cours."""
+    data = []
+    for c in Cours.objects.select_related('enseignant').iterator():
+        data.append({
+            'id': c.id,
+            'nom': c.nom,
+            'enseignant': c.enseignant.get_full_name(),
+            'formation': c.formation,
+            'jour': c.get_jour_display(),
+            'heure_debut': c.heure_debut.strftime('%H:%M'),
+            'heure_fin': c.heure_fin.strftime('%H:%M'),
+            'salle': c.salle,
+        })
+    return JsonResponse(data, safe=False)
+
+
+@powerbi_api_key_required
+def powerbi_annonces(request):
+    """JSON — Toutes les annonces."""
+    data = []
+    for a in Annonce.objects.select_related('auteur').iterator():
+        data.append({
+            'id': a.id,
+            'titre': a.titre,
+            'contenu': a.contenu[:300],
+            'auteur': a.auteur.get_full_name(),
+            'priorite': a.get_priorite_display(),
+            'destinataires_role': a.destinataires_role,
+            'date_creation': a.date_creation.strftime('%Y-%m-%d'),
+            'active': a.active,
+        })
+    return JsonResponse(data, safe=False)
+
+
+@powerbi_api_key_required
+def powerbi_base_connaissance(request):
+    """JSON — Toute la base de connaissance du chatbot."""
+    data = []
+    for b in BaseConnaissance.objects.iterator():
+        data.append({
+            'id': b.id,
+            'question': b.question,
+            'reponse': b.reponse,
+            'mots_cles': b.mots_cles,
+            'categorie': b.get_categorie_display(),
+            'lien_document': b.lien_document,
+        })
+    return JsonResponse(data, safe=False)

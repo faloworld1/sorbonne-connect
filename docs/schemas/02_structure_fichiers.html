@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>2. Structure des Fichiers — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1200px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        table { border-collapse: collapse; width: 100%; max-width: 1100px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th { background: #1a237e; color: white; padding: 12px 16px; text-align: left; }
+        td { padding: 10px 16px; border-bottom: 1px solid #eee; font-size: 14px; }
+        tr:hover { background: #f0f0ff; }
+        code { background: #e8eaf6; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>2. Structure des Fichiers du Projet</h1>
+
+    <div class="diagram">
+        <pre class="mermaid">
+graph TD
+    ROOT["sorbonne_connect_django/"]
+
+    ROOT --> CONFIG["sorbonne_connect/\nConfiguration Django"]
+    ROOT --> A["accounts/\nAuth et Rôles"]
+    ROOT --> C["chatbot/\nAgent Q&A"]
+    ROOT --> CP["campus/\nVie universitaire"]
+    ROOT --> R["reporting/\nAnalytics"]
+    ROOT --> T["templates/\nbase.html"]
+    ROOT --> S["static/css/\nstyle.css"]
+    ROOT --> DB["db.sqlite3"]
+    ROOT --> MNG["manage.py"]
+
+    CONFIG --> SETTINGS["settings.py"]
+    CONFIG --> URLS_R["urls.py racine"]
+
+    A --> A_M["models.py\n1 modèle"]
+    A --> A_V["views.py\n5 vues"]
+    A --> A_F["forms.py\n3 formulaires"]
+    A --> A_D["decorators.py"]
+    A --> A_CMD["commands/\ncreate_demo_users"]
+
+    C --> C_M["models.py\n2 modèles"]
+    C --> C_V["views.py\n6 vues + algo NLP"]
+    C --> C_CMD["commands/\nload_knowledge_base"]
+
+    CP --> CP_M["models.py\n6 modèles"]
+    CP --> CP_V["views.py\n13 vues"]
+    CP --> CP_F["forms.py\n5 formulaires"]
+    CP --> CP_T["templatetags/\n8 tags"]
+
+    R --> R_V["views.py\n17 fonctions"]
+    R --> R_CMD["commands/\ngenerate_demo_data"]
+        </pre>
+    </div>
+
+    <h1 style="font-size: 20px; margin-top: 40px;">Détail par application</h1>
+
+    <table>
+        <tr><th>App</th><th>Fichier</th><th>Contenu</th></tr>
+        <tr><td rowspan="3"><strong>sorbonne_connect/</strong></td><td><code>settings.py</code></td><td>AUTH_USER_MODEL, POWERBI_API_KEY, 4 apps, langue fr-fr, timezone Paris</td></tr>
+        <tr><td><code>urls.py</code></td><td>Dispatch : '' → accounts+chatbot, campus/ → campus, reporting/ → reporting</td></tr>
+        <tr><td><code>wsgi.py</code></td><td>Point d'entrée WSGI</td></tr>
+
+        <tr><td rowspan="7"><strong>accounts/</strong></td><td><code>models.py</code></td><td>Utilisateur (AbstractUser + role, formation, num_etudiant, tel)</td></tr>
+        <tr><td><code>views.py</code></td><td>ConnexionView, DeconnexionView, inscription, dashboard, profil</td></tr>
+        <tr><td><code>forms.py</code></td><td>ConnexionForm, InscriptionForm, ProfilForm</td></tr>
+        <tr><td><code>decorators.py</code></td><td>role_required(*roles) — contrôle d'accès par rôle</td></tr>
+        <tr><td><code>urls.py</code></td><td>5 routes : login, logout, register, dashboard, profil</td></tr>
+        <tr><td><code>admin.py</code></td><td>UtilisateurAdmin avec fieldsets personnalisés</td></tr>
+        <tr><td><code>commands/</code></td><td>create_demo_users.py — 6 comptes de test</td></tr>
+
+        <tr><td rowspan="5"><strong>chatbot/</strong></td><td><code>models.py</code></td><td>BaseConnaissance (30 Q&A) + LogChatbot (logs interactions)</td></tr>
+        <tr><td><code>views.py</code></td><td>normalize(), find_match() + 6 vues (portal, index, 4 API)</td></tr>
+        <tr><td><code>urls.py</code></td><td>6 routes : /, /chatbot/, /api/send|satisfaction|stats|logs/</td></tr>
+        <tr><td><code>admin.py</code></td><td>Admin pour BaseConnaissance et LogChatbot</td></tr>
+        <tr><td><code>commands/</code></td><td>load_knowledge_base.py — charge 30 Q&A</td></tr>
+
+        <tr><td rowspan="6"><strong>campus/</strong></td><td><code>models.py</code></td><td>Association, Evenement, Publication, Cours, Emargement, Annonce</td></tr>
+        <tr><td><code>views.py</code></td><td>13 vues : CRUD événements, publications, annonces, associations, cours, émargement</td></tr>
+        <tr><td><code>forms.py</code></td><td>EvenementForm, PublicationForm, AnnonceForm, AssociationForm, CoursForm</td></tr>
+        <tr><td><code>urls.py</code></td><td>15 routes sous /campus/</td></tr>
+        <tr><td><code>admin.py</code></td><td>6 ModelAdmin</td></tr>
+        <tr><td><code>templatetags/</code></td><td>campus_tags.py — 8 tags pour les dashboards</td></tr>
+
+        <tr><td rowspan="3"><strong>reporting/</strong></td><td><code>views.py</code></td><td>dashboard + 4 exports CSV + 1 API stats + 5 API Power BI + helpers</td></tr>
+        <tr><td><code>urls.py</code></td><td>11 routes sous /reporting/</td></tr>
+        <tr><td><code>commands/</code></td><td>generate_demo_data.py — génère 1000+ données réalistes</td></tr>
+    </table>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

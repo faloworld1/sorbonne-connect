@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>5. Routage URL — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        table { border-collapse: collapse; width: 100%; max-width: 1100px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th { background: #1a237e; color: white; padding: 10px 14px; text-align: left; font-size: 13px; }
+        td { padding: 8px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
+        tr:hover { background: #f0f0ff; }
+        .public { color: #2e7d32; font-weight: bold; }
+        .auth { color: #f57f17; font-weight: bold; }
+        .role { color: #c62828; font-weight: bold; }
+        .api { color: #6a1b9a; font-weight: bold; }
+        h2 { max-width: 1100px; margin: 30px auto 5px; color: #333; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: white; }
+        .badge-public { background: #2e7d32; }
+        .badge-auth { background: #f57f17; }
+        .badge-role { background: #c62828; }
+        .badge-api { background: #6a1b9a; }
+        .legend { max-width: 1100px; margin: 10px auto 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>5. Routage URL Complet (37 routes)</h1>
+
+    <div class="legend">
+        <span class="badge badge-public">Public</span> Accessible sans connexion &nbsp;
+        <span class="badge badge-auth">Auth</span> @login_required &nbsp;
+        <span class="badge badge-role">Rôle</span> @role_required &nbsp;
+        <span class="badge badge-api">API Key</span> @powerbi_api_key_required
+    </div>
+
+    <h2>accounts/ — Authentification (5 routes)</h2>
+    <table>
+        <tr><th>URL</th><th>Vue</th><th>Méthode</th><th>Accès</th></tr>
+        <tr><td>/login/</td><td>ConnexionView</td><td>GET, POST</td><td class="public">Public</td></tr>
+        <tr><td>/register/</td><td>inscription()</td><td>GET, POST</td><td class="public">Public</td></tr>
+        <tr><td>/logout/</td><td>DeconnexionView</td><td>POST</td><td class="auth">Auth</td></tr>
+        <tr><td>/dashboard/</td><td>dashboard()</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/profil/</td><td>profil()</td><td>GET, POST</td><td class="auth">Auth</td></tr>
+    </table>
+
+    <h2>chatbot/ — Agent conversationnel (6 routes)</h2>
+    <table>
+        <tr><th>URL</th><th>Vue</th><th>Méthode</th><th>Accès</th></tr>
+        <tr><td>/</td><td>portal()</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/chatbot/</td><td>index()</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/api/send/</td><td>api_send_message()</td><td>POST</td><td class="auth">Auth</td></tr>
+        <tr><td>/api/satisfaction/</td><td>api_satisfaction()</td><td>POST</td><td class="auth">Auth</td></tr>
+        <tr><td>/api/stats/</td><td>api_stats()</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/api/logs/</td><td>api_logs()</td><td>GET</td><td class="auth">Auth</td></tr>
+    </table>
+
+    <h2>campus/ — Vie universitaire (15 routes)</h2>
+    <table>
+        <tr><th>URL</th><th>Vue</th><th>Méthode</th><th>Accès</th></tr>
+        <tr><td>/campus/evenements/</td><td>liste_evenements</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/campus/evenements/creer/</td><td>creer_evenement</td><td>GET, POST</td><td class="auth">Auth</td></tr>
+        <tr><td>/campus/evenements/moderer/</td><td>moderer_evenements</td><td>GET</td><td class="role">admin_univ, bde</td></tr>
+        <tr><td>/campus/evenements/&lt;pk&gt;/valider/</td><td>valider_evenement</td><td>POST</td><td class="role">admin_univ, bde</td></tr>
+        <tr><td>/campus/publications/</td><td>liste_publications</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/campus/publications/creer/</td><td>creer_publication</td><td>GET, POST</td><td class="role">bde, admin_univ</td></tr>
+        <tr><td>/campus/publications/&lt;pk&gt;/modifier/</td><td>modifier_publication</td><td>GET, POST</td><td class="role">bde, admin_univ</td></tr>
+        <tr><td>/campus/annonces/</td><td>liste_annonces</td><td>GET</td><td class="auth">Auth (filtré par rôle)</td></tr>
+        <tr><td>/campus/annonces/creer/</td><td>creer_annonce</td><td>GET, POST</td><td class="role">admin_univ</td></tr>
+        <tr><td>/campus/associations/</td><td>liste_associations</td><td>GET</td><td class="auth">Auth</td></tr>
+        <tr><td>/campus/associations/creer/</td><td>creer_association</td><td>GET, POST</td><td class="role">association, admin_univ</td></tr>
+        <tr><td>/campus/associations/&lt;pk&gt;/rejoindre/</td><td>rejoindre_association</td><td>POST</td><td class="auth">Auth</td></tr>
+        <tr><td>/campus/emploi-du-temps/</td><td>emploi_du_temps</td><td>GET</td><td class="auth">Auth (filtré par rôle)</td></tr>
+        <tr><td>/campus/cours/creer/</td><td>creer_cours</td><td>GET, POST</td><td class="role">enseignant, admin_univ</td></tr>
+        <tr><td>/campus/emargement/&lt;cours_id&gt;/</td><td>emargement</td><td>GET, POST</td><td class="role">enseignant</td></tr>
+    </table>
+
+    <h2>reporting/ — Analytics et Power BI (11 routes)</h2>
+    <table>
+        <tr><th>URL</th><th>Vue</th><th>Format</th><th>Accès</th></tr>
+        <tr><td>/reporting/</td><td>dashboard_reporting</td><td>HTML</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/export/chatbot/</td><td>export_chatbot_logs</td><td>CSV</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/export/emargements/</td><td>export_emargements</td><td>CSV</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/export/evenements/</td><td>export_evenements</td><td>CSV</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/export/utilisateurs/</td><td>export_utilisateurs</td><td>CSV</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/api/stats/</td><td>api_stats_globales</td><td>JSON</td><td class="role">admin_univ</td></tr>
+        <tr><td>/reporting/powerbi/stats/</td><td>powerbi_stats</td><td>JSON</td><td class="api">API Key</td></tr>
+        <tr><td>/reporting/powerbi/chatbot/</td><td>powerbi_chatbot_logs</td><td>JSON</td><td class="api">API Key</td></tr>
+        <tr><td>/reporting/powerbi/emargements/</td><td>powerbi_emargements</td><td>JSON</td><td class="api">API Key</td></tr>
+        <tr><td>/reporting/powerbi/evenements/</td><td>powerbi_evenements</td><td>JSON</td><td class="api">API Key</td></tr>
+        <tr><td>/reporting/powerbi/utilisateurs/</td><td>powerbi_utilisateurs</td><td>JSON</td><td class="api">API Key</td></tr>
+    </table>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

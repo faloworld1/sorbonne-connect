@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>3. Modèle de Données — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        h2 { color: #333; max-width: 1100px; margin: 30px auto 10px; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1200px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        table { border-collapse: collapse; width: 100%; max-width: 1100px; margin: 10px auto 30px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        th { background: #1a237e; color: white; padding: 10px 14px; text-align: left; font-size: 13px; }
+        td { padding: 8px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .pk { color: #d32f2f; font-weight: bold; }
+        .fk { color: #1565c0; }
+        .nullable { color: #999; font-style: italic; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>3. Modèle de Données (9 tables)</h1>
+
+    <div class="diagram">
+        <pre class="mermaid">
+erDiagram
+    Utilisateur ||--o{ Evenement : organise
+    Utilisateur ||--o{ Publication : ecrit
+    Utilisateur ||--o{ Annonce : publie
+    Utilisateur ||--o{ Cours : enseigne
+    Utilisateur ||--o{ Emargement : est_emarge
+    Utilisateur ||--o{ Association : responsable
+    Utilisateur }o--o{ Association : membre_de
+    Cours ||--o{ Emargement : contient
+    Association ||--o{ Evenement : lie_a
+    BaseConnaissance ||--o{ LogChatbot : matchee
+        </pre>
+    </div>
+
+    <h2>accounts.Utilisateur</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td>Identifiant auto</td></tr>
+        <tr><td>username</td><td>CharField(150)</td><td>UNIQUE</td><td>Nom d'utilisateur</td></tr>
+        <tr><td>password</td><td>CharField(128)</td><td>NOT NULL</td><td>Hash PBKDF2</td></tr>
+        <tr><td>email</td><td>EmailField</td><td></td><td>Email</td></tr>
+        <tr><td>first_name</td><td>CharField(150)</td><td></td><td>Prénom</td></tr>
+        <tr><td>last_name</td><td>CharField(150)</td><td></td><td>Nom</td></tr>
+        <tr><td><strong>role</strong></td><td>CharField(20)</td><td>NOT NULL, default='etudiant'</td><td>etudiant | enseignant | bde | association | admin_univ</td></tr>
+        <tr><td>numero_etudiant</td><td>CharField(20)</td><td>blank</td><td>Numéro étudiant (ex: 20240001)</td></tr>
+        <tr><td><strong>formation</strong></td><td>CharField(100)</td><td>blank</td><td>Ex: BIDABI1 — lie aux Cours et à l'Émargement</td></tr>
+        <tr><td>telephone</td><td>CharField(20)</td><td>blank</td><td>Téléphone</td></tr>
+        <tr><td>is_active</td><td>BooleanField</td><td>default=True</td><td>Compte actif</td></tr>
+        <tr><td>is_superuser</td><td>BooleanField</td><td>default=False</td><td>Bypass toutes les permissions</td></tr>
+        <tr><td>date_joined</td><td>DateTimeField</td><td>auto</td><td>Date d'inscription</td></tr>
+    </table>
+
+    <h2>chatbot.BaseConnaissance</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>question</td><td>TextField</td><td>NOT NULL</td><td>Question de référence</td></tr>
+        <tr><td>reponse</td><td>TextField</td><td>NOT NULL</td><td>Réponse HTML</td></tr>
+        <tr><td>mots_cles</td><td>TextField</td><td>NOT NULL</td><td>Séparés par ; (ex: bourse;crous;aide)</td></tr>
+        <tr><td>categorie</td><td>CharField(50)</td><td>NOT NULL</td><td>Scolarité | Vie étudiante | Campus | Stages | Bourses | Numérique</td></tr>
+        <tr><td>lien_document</td><td>URLField</td><td>blank</td><td>Lien optionnel vers une ressource</td></tr>
+    </table>
+
+    <h2>chatbot.LogChatbot</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>date_heure</td><td>DateTimeField</td><td>auto_now_add</td><td>Horodatage automatique</td></tr>
+        <tr><td>session_id</td><td>CharField(100)</td><td></td><td>ID de session Django</td></tr>
+        <tr><td>question_posee</td><td>TextField</td><td>NOT NULL</td><td>Question brute de l'utilisateur</td></tr>
+        <tr><td>reponse_fournie</td><td>TextField</td><td>NOT NULL</td><td>Réponse retournée</td></tr>
+        <tr><td>match_trouve</td><td>BooleanField</td><td>default=False</td><td>True si une correspondance a été trouvée</td></tr>
+        <tr><td class="fk">question_matchee_id</td><td>FK → BaseConnaissance</td><td class="nullable">NULL, SET_NULL</td><td>Q&A matchée (NULL si aucun match)</td></tr>
+        <tr><td>satisfaction</td><td>CharField(20)</td><td>blank</td><td>'' | Utile | Pas utile</td></tr>
+    </table>
+
+    <h2>campus.Association</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>nom</td><td>CharField(200)</td><td>NOT NULL</td><td>Nom de l'asso</td></tr>
+        <tr><td>description</td><td>TextField</td><td>NOT NULL</td><td></td></tr>
+        <tr><td class="fk">responsable_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td>Créateur/responsable</td></tr>
+        <tr><td>membres</td><td>ManyToMany → Utilisateur</td><td>blank</td><td>Table intermédiaire auto</td></tr>
+        <tr><td>date_creation</td><td>DateTimeField</td><td>auto_now_add</td><td></td></tr>
+        <tr><td>active</td><td>BooleanField</td><td>default=True</td><td></td></tr>
+    </table>
+
+    <h2>campus.Evenement</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>titre</td><td>CharField(200)</td><td></td><td></td></tr>
+        <tr><td>description</td><td>TextField</td><td></td><td></td></tr>
+        <tr><td>date_debut / date_fin</td><td>DateTimeField</td><td></td><td>Période de l'événement</td></tr>
+        <tr><td>lieu</td><td>CharField(200)</td><td></td><td></td></tr>
+        <tr><td class="fk">organisateur_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td></td></tr>
+        <tr><td class="fk">association_id</td><td>FK → Association</td><td class="nullable">NULL, SET_NULL</td><td>Optionnel</td></tr>
+        <tr><td><strong>statut</strong></td><td>CharField(20)</td><td>default='en_attente'</td><td>en_attente | approuve | refuse</td></tr>
+    </table>
+
+    <h2>campus.Publication</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>titre</td><td>CharField(200)</td><td></td><td></td></tr>
+        <tr><td>contenu</td><td>TextField</td><td></td><td></td></tr>
+        <tr><td class="fk">auteur_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td></td></tr>
+        <tr><td><strong>statut</strong></td><td>CharField(20)</td><td>default='brouillon'</td><td>brouillon | publie | archive</td></tr>
+        <tr><td>date_creation</td><td>DateTimeField</td><td>auto_now_add</td><td></td></tr>
+        <tr><td>date_modification</td><td>DateTimeField</td><td>auto_now</td><td></td></tr>
+    </table>
+
+    <h2>campus.Cours</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>nom</td><td>CharField(200)</td><td></td><td>Ex: Bases de données</td></tr>
+        <tr><td class="fk">enseignant_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td></td></tr>
+        <tr><td><strong>formation</strong></td><td>CharField(100)</td><td></td><td>Lie le cours aux étudiants de la même formation</td></tr>
+        <tr><td>jour</td><td>CharField(10)</td><td></td><td>lundi | mardi | ... | samedi</td></tr>
+        <tr><td>heure_debut / heure_fin</td><td>TimeField</td><td></td><td></td></tr>
+        <tr><td>salle</td><td>CharField(50)</td><td></td><td></td></tr>
+    </table>
+
+    <h2>campus.Emargement</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td class="fk">cours_id</td><td>FK → Cours</td><td>CASCADE</td><td></td></tr>
+        <tr><td class="fk">etudiant_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td></td></tr>
+        <tr><td>date</td><td>DateField</td><td>UNIQUE(cours, etudiant, date)</td><td></td></tr>
+        <tr><td>present</td><td>BooleanField</td><td>default=False</td><td></td></tr>
+    </table>
+
+    <h2>campus.Annonce</h2>
+    <table>
+        <tr><th>Champ</th><th>Type</th><th>Contrainte</th><th>Description</th></tr>
+        <tr><td class="pk">id</td><td>BigAutoField</td><td>PK</td><td></td></tr>
+        <tr><td>titre</td><td>CharField(200)</td><td></td><td></td></tr>
+        <tr><td>contenu</td><td>TextField</td><td></td><td></td></tr>
+        <tr><td class="fk">auteur_id</td><td>FK → Utilisateur</td><td>CASCADE</td><td></td></tr>
+        <tr><td>priorite</td><td>CharField(20)</td><td>default='info'</td><td>info | important | urgent</td></tr>
+        <tr><td><strong>destinataires_role</strong></td><td>CharField(20)</td><td>blank='' → tous</td><td>Filtre par rôle (vide = tous les rôles)</td></tr>
+        <tr><td>active</td><td>BooleanField</td><td>default=True</td><td></td></tr>
+    </table>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>6. Flux du Chatbot — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        h2 { color: #333; max-width: 1100px; margin: 30px auto 10px; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1100px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        .note { max-width: 1100px; margin: 10px auto; padding: 15px 20px; background: #e8eaf6; border-left: 4px solid #1a237e; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>6. Flux du Chatbot — Question → Réponse</h1>
+
+    <h2>6.1 — Algorithme de matching</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    INPUT["Utilisateur tape :\noù manger sur le campus ?"]
+    NORM["normalize\n1. Minuscules\n2. Supprime accents NFD\n3. Garde a-z 0-9 espaces\nResultat : ou manger sur le campus"]
+    LOOP["Pour chaque entrée\nde BaseConnaissance\ncalcul du score"]
+    MC["Mot-clé : manger\nnormalisé : manger\nmanger IN ou manger sur le campus\n→ +3 points"]
+    MC2["Mot-clé : campus\nnormalisé : campus\ncampus IN ou manger sur le campus\n→ +3 points"]
+    MC3["Mot-clé : restaurant\nNon trouvé → +0"]
+    BEST["Meilleur score = 6\nMeilleur match = entrée 14"]
+    CHECK{"Score >= 1 ?"}
+    YES["Retourne entrée 14\navec sa réponse"]
+    NO["Retourne None\n→ message par défaut"]
+
+    INPUT --> NORM
+    NORM --> LOOP
+    LOOP --> MC
+    LOOP --> MC2
+    LOOP --> MC3
+    MC --> BEST
+    MC2 --> BEST
+    MC3 --> BEST
+    BEST --> CHECK
+    CHECK -->|Oui| YES
+    CHECK -->|Non| NO
+        </pre>
+    </div>
+
+    <div class="note">
+        <strong>Scoring :</strong> +3 points si le mot-clé complet est trouvé comme sous-chaîne
+        dans le texte normalisé. +1 point par mot individuel du mot-clé trouvé dans les mots
+        de l'input. Le seuil minimum est de 1 point.
+    </div>
+
+    <h2>6.2 — Flux complet requête ↔ réponse</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+sequenceDiagram
+    actor E as Etudiant
+    participant JS as Frontend JS
+    participant API as api_send_message
+    participant NLP as find_match
+    participant DB as SQLite3
+
+    E->>JS: Tape question + Envoyer
+    JS->>API: POST /api/send/ JSON
+    API->>API: Vérifie auth + CSRF + POST
+    API->>API: Parse JSON
+    API->>NLP: find_match(question)
+    NLP->>DB: BaseConnaissance.objects.all()
+    DB->>NLP: 30 entrées
+    NLP->>NLP: Calcul des scores
+    NLP->>API: Match trouvé ou None
+
+    alt Match trouvé
+        API->>DB: INSERT LogChatbot match=True
+        API->>JS: JSON reponse + categorie + log_id
+    else Aucun match
+        API->>DB: INSERT LogChatbot match=False
+        API->>JS: JSON message par défaut + log_id
+    end
+
+    JS->>E: Affiche réponse + boutons satisfaction
+    E->>JS: Clique Utile
+    JS->>API: POST /api/satisfaction/ log_id + oui
+    API->>DB: UPDATE satisfaction = Utile
+        </pre>
+    </div>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

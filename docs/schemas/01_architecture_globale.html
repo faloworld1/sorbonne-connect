@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>1. Architecture Globale — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1100px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .legend { max-width: 1100px; margin: 20px auto; background: white; border-radius: 12px; padding: 20px; }
+        .legend h3 { margin-top: 0; color: #333; }
+        .legend ul { line-height: 1.8; }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>1. Architecture Globale — Campus Connect USPN</h1>
+
+    <div class="diagram">
+        <pre class="mermaid">
+graph TB
+    Browser["Navigateur Web"]
+    AJAX["Requêtes AJAX chatbot"]
+
+    MW["Middleware Django\nSecurity - Session - CSRF - Auth - Messages"]
+
+    ACC["accounts\nAuth et Rôles"]
+    CHAT["chatbot\nAgent Q&A"]
+    CAMP["campus\nVie universitaire"]
+    REP["reporting\nAnalytics et Export"]
+
+    DB[(SQLite3)]
+    PBI["Power BI"]
+    ADM["Django Admin"]
+    CSS["static/css/style.css"]
+
+    Browser -->|HTTP GET/POST| MW
+    AJAX -->|JSON| MW
+    MW --> ACC
+    MW --> CHAT
+    MW --> CAMP
+    MW --> REP
+    ACC -->|ORM| DB
+    CHAT -->|ORM| DB
+    CAMP -->|ORM| DB
+    REP -->|ORM| DB
+    REP -->|CSV + JSON API| PBI
+    ACC --> ADM
+    CSS --> Browser
+        </pre>
+    </div>
+
+    <div class="legend">
+        <h3>Légende</h3>
+        <ul>
+            <li><strong>Navigateur Web</strong> : le client envoie des requêtes HTTP classiques (formulaires) et des requêtes AJAX (chatbot)</li>
+            <li><strong>Middleware Django</strong> : 7 couches de traitement (sécurité, session, CSRF, authentification, messages)</li>
+            <li><strong>4 Apps Django</strong> : accounts (auth), chatbot (Q&A), campus (vie univ.), reporting (analytics)</li>
+            <li><strong>SQLite3</strong> : base de données relationnelle locale (db.sqlite3)</li>
+            <li><strong>Power BI</strong> : connecté via exports CSV ou API JSON avec clé API</li>
+        </ul>
+    </div>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>

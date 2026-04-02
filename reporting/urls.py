@@ -23,4 +23,9 @@ urlpatterns = [
     path('powerbi/emargements/', views.powerbi_emargements, name='powerbi_emargements'),
     path('powerbi/evenements/', views.powerbi_evenements, name='powerbi_evenements'),
     path('powerbi/utilisateurs/', views.powerbi_utilisateurs, name='powerbi_utilisateurs'),
+    path('powerbi/associations/', views.powerbi_associations, name='powerbi_associations'),
+    path('powerbi/publications/', views.powerbi_publications, name='powerbi_publications'),
+    path('powerbi/cours/', views.powerbi_cours, name='powerbi_cours'),
+    path('powerbi/annonces/', views.powerbi_annonces, name='powerbi_annonces'),
+    path('powerbi/base_connaissance/', views.powerbi_base_connaissance, name='powerbi_base_connaissance'),
 ]

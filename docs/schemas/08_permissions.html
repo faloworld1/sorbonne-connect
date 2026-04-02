@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>8. Matrice des Permissions — Campus Connect</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        h1 { color: #1a237e; text-align: center; }
+        h2 { color: #333; max-width: 1200px; margin: 30px auto 10px; }
+        .diagram { background: white; border-radius: 12px; padding: 30px; max-width: 1200px; margin: 20px auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        nav { text-align: center; margin-bottom: 20px; }
+        nav a { margin: 0 6px; color: #1a237e; text-decoration: none; font-size: 14px; }
+        nav a:hover { text-decoration: underline; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th { background: #1a237e; color: white; padding: 10px; text-align: center; font-size: 13px; }
+        th:first-child { text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: center; font-size: 14px; }
+        td:first-child { text-align: left; font-weight: 600; }
+        tr:hover { background: #f0f0f0; }
+        .yes { color: #2e7d32; font-weight: bold; }
+        .no { color: #c62828; }
+        .own { color: #e65100; font-weight: bold; }
+        .legend { max-width: 1200px; margin: 15px auto; padding: 15px; background: #e8eaf6; border-radius: 8px; font-size: 14px; display: flex; gap: 30px; flex-wrap: wrap; }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .cat { background: #e8eaf6; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>Navigation :</strong>
+        <a href="01_architecture_globale.html">1. Archi globale</a> |
+        <a href="02_structure_fichiers.html">2. Fichiers</a> |
+        <a href="03_modele_donnees.html">3. BDD</a> |
+        <a href="04_flux_authentification.html">4. Auth</a> |
+        <a href="05_routage_urls.html">5. URLs</a> |
+        <a href="06_flux_chatbot.html">6. Chatbot</a> |
+        <a href="07_pipeline_powerbi.html">7. Power BI</a> |
+        <a href="08_permissions.html">8. Permissions</a>
+    </nav>
+
+    <h1>8. Matrice des Permissions par Rôle</h1>
+
+    <div class="legend">
+        <span><span class="yes">✔ OUI</span> — Accès complet</span>
+        <span><span class="own">◐ PROPRES</span> — Seulement ses propres données</span>
+        <span><span class="no">✘ NON</span> — Pas d'accès</span>
+    </div>
+
+    <div class="diagram">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 28%;">Fonctionnalité</th>
+                    <th>Étudiant</th>
+                    <th>Enseignant</th>
+                    <th>BDE</th>
+                    <th>Association</th>
+                    <th>Admin Univ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Chatbot -->
+                <tr class="cat"><td colspan="6">Chatbot</td></tr>
+                <tr>
+                    <td>Utiliser le chatbot</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Donner un feedback satisfaction</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Voir historique chatbot</td>
+                    <td class="own">◐</td>
+                    <td class="own">◐</td>
+                    <td class="own">◐</td>
+                    <td class="own">◐</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Evenements -->
+                <tr class="cat"><td colspan="6">Événements</td></tr>
+                <tr>
+                    <td>Voir les événements</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Créer un événement</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Modifier / supprimer événement</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="own">◐</td>
+                    <td class="own">◐</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>S'inscrire à un événement</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Valider / modérer événement</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Publications -->
+                <tr class="cat"><td colspan="6">Publications</td></tr>
+                <tr>
+                    <td>Voir les publications</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Créer une publication</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Modérer publications</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Annonces -->
+                <tr class="cat"><td colspan="6">Annonces</td></tr>
+                <tr>
+                    <td>Voir les annonces (ciblées par rôle)</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Créer une annonce</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Associations -->
+                <tr class="cat"><td colspan="6">Associations</td></tr>
+                <tr>
+                    <td>Voir les associations</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Rejoindre une association</td>
+                    <td class="yes">✔</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                </tr>
+                <tr>
+                    <td>Créer une association</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Scolarité -->
+                <tr class="cat"><td colspan="6">Scolarité</td></tr>
+                <tr>
+                    <td>Voir son emploi du temps</td>
+                    <td class="yes">✔</td>
+                    <td class="yes">✔</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Créer des cours</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Signer l'émargement</td>
+                    <td class="yes">✔</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                </tr>
+                <tr>
+                    <td>Voir assiduité globale</td>
+                    <td class="no">✘</td>
+                    <td class="own">◐</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+
+                <!-- Reporting -->
+                <tr class="cat"><td colspan="6">Reporting & Power BI</td></tr>
+                <tr>
+                    <td>Tableau de bord reporting</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>Exports CSV</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="no">✘</td>
+                    <td class="yes">✔</td>
+                </tr>
+                <tr>
+                    <td>API JSON Power BI</td>
+                    <td colspan="5" style="text-align: center; color: #e65100; font-weight: bold;">Accès par clé API uniquement (indépendant des rôles)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>8.2 — Schéma du contrôle d'accès</h2>
+    <div class="diagram">
+        <pre class="mermaid">
+flowchart TD
+    REQ["Requête HTTP"]
+    MW{"Middleware\nLoginRequired ?"}
+    ANON["Page publique\nLogin / Register"]
+    AUTH{"Décorateur\n@role_required ?"}
+    DENIED["403 Accès refusé"]
+    VIEW["Vue autorisée"]
+    OWN{"Filtre\npropriétaire ?"}
+    DATA["Données filtrées\npar utilisateur"]
+    ALL["Toutes les données"]
+
+    REQ --> MW
+    MW -->|Non requis| ANON
+    MW -->|Connecté| AUTH
+    MW -->|Non connecté| ANON
+    AUTH -->|Rôle OK| VIEW
+    AUTH -->|Rôle KO| DENIED
+    VIEW --> OWN
+    OWN -->|Oui| DATA
+    OWN -->|Admin| ALL
+        </pre>
+    </div>
+
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
+</body>
+</html>
