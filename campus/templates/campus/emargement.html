@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Émargement — {{ cours.nom }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>✅ Émargement</h1>
+    <a href="{% url 'campus:emploi_du_temps' %}" class="btn btn-outline">← Retour</a>
+</div>
+
+<div class="card" style="max-width: 700px;">
+    <div class="card-header">
+        <h2>{{ cours.nom }} — {{ cours.get_jour_display }}</h2>
+        <span>{{ date|date:"d/m/Y" }}</span>
+    </div>
+    <div class="card-body">
+        {% if etudiants_data %}
+        <form method="post">
+            {% csrf_token %}
+            <p style="margin-bottom: 1rem; color: var(--gray-500); font-size: 0.875rem;">
+                {{ etudiants_data|length }} étudiant{{ etudiants_data|length|pluralize:"s" }} en {{ cours.formation }}
+            </p>
+            {% for item in etudiants_data %}
+            <div class="checkbox-row">
+                <input type="checkbox" name="presents" value="{{ item.etudiant.pk }}"
+                       id="etu_{{ item.etudiant.pk }}"
+                       {% if item.present %}checked{% endif %}>
+                <label for="etu_{{ item.etudiant.pk }}">
+                    {{ item.etudiant.last_name }} {{ item.etudiant.first_name }}
+                    {% if item.etudiant.numero_etudiant %}
+                    <span style="color: var(--gray-400);">({{ item.etudiant.numero_etudiant }})</span>
+                    {% endif %}
+                </label>
+            </div>
+            {% endfor %}
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-success">Enregistrer l'émargement</button>
+            </div>
+        </form>
+        {% else %}
+        <div class="empty-state">
+            <div class="icon">👥</div>
+            <p>Aucun étudiant inscrit dans la formation « {{ cours.formation }} »</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

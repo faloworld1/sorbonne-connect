@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — Administration{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Administration Campus Connect 🛡️</h1>
+    <p>Vue d'ensemble de la plateforme</p>
+    <div class="quick-actions">
+        <a href="{% url 'campus:creer_annonce' %}" class="btn">📢 Nouvelle annonce</a>
+        <a href="{% url 'campus:moderer_evenements' %}" class="btn">⚙️ Modérer les événements</a>
+        <a href="{% url 'reporting:dashboard' %}" class="btn">📊 Reporting</a>
+        <a href="/admin/" class="btn">🔧 Admin Django</a>
+    </div>
+</div>
+
+{% load campus_tags %}
+{% get_platform_stats as stats %}
+
+<div class="grid grid-4" style="margin-top: 1.5rem;">
+    <div class="stat-box">
+        <div class="stat-value">{{ stats.utilisateurs }}</div>
+        <div class="stat-label">Utilisateurs</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ stats.evenements }}</div>
+        <div class="stat-label">Événements</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ stats.publications }}</div>
+        <div class="stat-label">Publications</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ stats.associations }}</div>
+        <div class="stat-label">Associations</div>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>⏳ Événements en attente</h2>
+            <a href="{% url 'campus:moderer_evenements' %}" class="btn btn-sm btn-outline">Voir tout</a>
+        </div>
+        <div class="card-body">
+            {% get_pending_events as pending %}
+            {% for evt in pending|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ evt.titre }}</h3>
+                    <p>{{ evt.organisateur.get_full_name }} · {{ evt.date_debut|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state"><div class="icon">✅</div><p>Rien à modérer</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>📢 Dernières annonces</h2>
+            <a href="{% url 'campus:creer_annonce' %}" class="btn btn-sm btn-primary">+ Nouvelle</a>
+        </div>
+        <div class="card-body">
+            {% get_annonces_for_user user as annonces %}
+            {% for annonce in annonces|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ annonce.titre }}</h3>
+                    <p>{{ annonce.date_creation|date:"d/m/Y" }}</p>
+                </div>
+                <span class="badge badge-{{ annonce.priorite }}">{{ annonce.get_priorite_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state"><div class="icon">📭</div><p>Aucune annonce</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

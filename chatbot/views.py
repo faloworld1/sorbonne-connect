@@ -2,6 +2,7 @@ import json
 import unicodedata
 import re
 
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -53,18 +54,21 @@ def find_match(user_input):
     return best_match if best_score >= 1 else None
 
 
+@login_required
 @ensure_csrf_cookie
 def index(request):
     """Page d'accueil du chatbot."""
     return render(request, 'chatbot/index.html')
 
 
+@login_required
 @ensure_csrf_cookie
 def portal(request):
     """Page d'accueil du portail Campus Connect."""
     return render(request, 'chatbot/portal.html')
 
 
+@login_required
 @require_POST
 def api_send_message(request):
     """API pour envoyer un message au chatbot et recevoir une réponse."""
@@ -119,6 +123,7 @@ def api_send_message(request):
     return JsonResponse(response_data)
 
 
+@login_required
 @require_POST
 def api_satisfaction(request):
     """API pour enregistrer la satisfaction sur le dernier message."""
@@ -144,6 +149,7 @@ def api_satisfaction(request):
     return JsonResponse({'status': 'ok'})
 
 
+@login_required
 def api_stats(request):
     """API pour récupérer les statistiques du chatbot."""
     total = LogChatbot.objects.count()
@@ -158,6 +164,7 @@ def api_stats(request):
     })
 
 
+@login_required
 def api_logs(request):
     """API pour récupérer les derniers logs."""
     logs = LogChatbot.objects.all()[:50]

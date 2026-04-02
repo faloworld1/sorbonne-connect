@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Associations{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🤝 Associations</h1>
+    {% if user.role == 'association' or user.role == 'admin_univ' %}
+    <a href="{% url 'campus:creer_association' %}" class="btn btn-primary">+ Créer une association</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% for asso in associations %}
+        <div class="list-item">
+            <div class="list-item-content">
+                <h3>{{ asso.nom }}</h3>
+                <p>{{ asso.description|truncatewords:30 }}</p>
+                <p style="font-size: 0.8rem; color: var(--gray-400); margin-top: 0.25rem;">
+                    Responsable : {{ asso.responsable.get_full_name }} · {{ asso.membres.count }} membre{{ asso.membres.count|pluralize:"s" }}
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                {% if user not in asso.membres.all and user != asso.responsable %}
+                <form method="post" action="{% url 'campus:rejoindre_association' asso.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-primary">Rejoindre</button>
+                </form>
+                {% else %}
+                <span class="badge badge-approuve">Membre</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="icon">🤝</div>
+            <p>Aucune association active</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Reporting{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📊 Reporting & Analytique</h1>
+</div>
+
+<!-- Stats globales -->
+<div class="grid grid-4">
+    <div class="stat-box">
+        <div class="stat-value">{{ total_utilisateurs }}</div>
+        <div class="stat-label">Utilisateurs inscrits</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ total_interactions }}</div>
+        <div class="stat-label">Interactions chatbot</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ taux_match }}%</div>
+        <div class="stat-label">Taux de match chatbot</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar {% if taux_match >= 70 %}success{% elif taux_match >= 40 %}warning{% else %}danger{% endif %}"
+                 style="width: {{ taux_match }}%"></div>
+        </div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ taux_assiduite }}%</div>
+        <div class="stat-label">Taux d'assiduité global</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar {% if taux_assiduite >= 70 %}success{% elif taux_assiduite >= 40 %}warning{% else %}danger{% endif %}"
+                 style="width: {{ taux_assiduite }}%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Détails -->
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>👥 Utilisateurs par rôle</h2>
+        </div>
+        <div class="card-body">
+            <table>
+                <thead>
+                    <tr><th>Rôle</th><th>Nombre</th></tr>
+                </thead>
+                <tbody>
+                    {% for item in utilisateurs_par_role %}
+                    <tr>
+                        <td>
+                            <span class="badge badge-{{ item.role }}">{{ item.role }}</span>
+                        </td>
+                        <td><strong>{{ item.total }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>💬 Satisfaction chatbot</h2>
+        </div>
+        <div class="card-body">
+            <div class="grid grid-3">
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--success);">{{ satisfaction_stats.utile }}</div>
+                    <div class="stat-label">Utile</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" style="color: var(--danger);">{{ satisfaction_stats.pas_utile }}</div>
+                    <div class="stat-label">Pas utile</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{ satisfaction_stats.total }}</div>
+                    <div class="stat-label">Total évalués</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats campus -->
+<div class="grid grid-4" style="margin-top: 1.5rem;">
+    <div class="stat-box">
+        <div class="stat-value">{{ total_evenements }}</div>
+        <div class="stat-label">Événements total</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ evenements_approuves }}</div>
+        <div class="stat-label">Événements approuvés</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ total_publications }}</div>
+        <div class="stat-label">Publications</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value">{{ total_associations }}</div>
+        <div class="stat-label">Associations actives</div>
+    </div>
+</div>
+
+<!-- Exports Power BI -->
+<div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h2>📥 Exports CSV pour Power BI</h2>
+    </div>
+    <div class="card-body">
+        <p style="margin-bottom: 1rem; color: var(--gray-500);">
+            Téléchargez les données au format CSV (séparateur point-virgule, encodage UTF-8 avec BOM)
+            pour les importer directement dans Power BI Desktop.
+        </p>
+        <div class="export-links">
+            <a href="{% url 'reporting:export_chatbot' %}" class="btn btn-outline">💬 Logs chatbot</a>
+            <a href="{% url 'reporting:export_emargements' %}" class="btn btn-outline">✅ Émargements</a>
+            <a href="{% url 'reporting:export_evenements' %}" class="btn btn-outline">🎉 Événements</a>
+            <a href="{% url 'reporting:export_utilisateurs' %}" class="btn btn-outline">👥 Utilisateurs</a>
+        </div>
+    </div>
+</div>
+
+<!-- API Power BI -->
+<div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h2>🔗 Connexion directe Power BI (API JSON)</h2>
+    </div>
+    <div class="card-body">
+        <p style="margin-bottom: 1rem; color: var(--gray-500);">
+            Utilisez ces URLs dans Power BI Desktop via <strong>Obtenir les données → Web</strong>
+            pour une actualisation dynamique des données. Clé API requise en paramètre.
+        </p>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Données</th><th>URL Power BI</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>📊 Statistiques globales</td>
+                        <td><code>http://127.0.0.1:8000{% url 'reporting:powerbi_stats' %}?api_key=VOTRE_CLE</code></td>
+                    </tr>
+                    <tr>
+                        <td>💬 Logs chatbot</td>
+                        <td><code>http://127.0.0.1:8000{% url 'reporting:powerbi_chatbot' %}?api_key=VOTRE_CLE</code></td>
+                    </tr>
+                    <tr>
+                        <td>✅ Émargements</td>
+                        <td><code>http://127.0.0.1:8000{% url 'reporting:powerbi_emargements' %}?api_key=VOTRE_CLE</code></td>
+                    </tr>
+                    <tr>
+                        <td>🎉 Événements</td>
+                        <td><code>http://127.0.0.1:8000{% url 'reporting:powerbi_evenements' %}?api_key=VOTRE_CLE</code></td>
+                    </tr>
+                    <tr>
+                        <td>👥 Utilisateurs</td>
+                        <td><code>http://127.0.0.1:8000{% url 'reporting:powerbi_utilisateurs' %}?api_key=VOTRE_CLE</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="margin-top: 1rem; color: var(--gray-400); font-size: 0.8rem;">
+            Clé API par défaut : <code>campus-connect-powerbi-2026</code>
+            — Modifiable via la variable d'environnement <code>POWERBI_API_KEY</code>
+        </p>
+    </div>
+</div>
+{% endblock %}

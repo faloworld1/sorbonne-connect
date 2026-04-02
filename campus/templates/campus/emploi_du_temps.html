@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Emploi du temps{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📅 Emploi du temps</h1>
+    {% if user.role == 'enseignant' %}
+    <a href="{% url 'campus:creer_cours' %}" class="btn btn-primary">+ Ajouter un cours</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Jour</th>
+                    <th>Horaires</th>
+                    <th>Cours</th>
+                    <th>Salle</th>
+                    <th>Formation</th>
+                    {% if user.role == 'enseignant' %}<th>Actions</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in cours %}
+                <tr>
+                    <td><strong>{{ c.get_jour_display }}</strong></td>
+                    <td>{{ c.heure_debut|time:"H:i" }} — {{ c.heure_fin|time:"H:i" }}</td>
+                    <td>{{ c.nom }}</td>
+                    <td>{{ c.salle }}</td>
+                    <td>{{ c.formation }}</td>
+                    {% if user.role == 'enseignant' %}
+                    <td>
+                        <a href="{% url 'campus:emargement' c.pk %}" class="btn btn-sm btn-outline">✅ Émargement</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{% if user.role == 'enseignant' %}6{% else %}5{% endif %}" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+                        Aucun cours trouvé
+                        {% if user.role == 'etudiant' and not user.formation %}
+                        — Renseignez votre formation dans votre <a href="{% url 'accounts:profil' %}">profil</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

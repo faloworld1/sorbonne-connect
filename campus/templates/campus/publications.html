@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Publications{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📝 Publications</h1>
+    {% if user.role == 'bde' or user.role == 'admin_univ' %}
+    <a href="{% url 'campus:creer_publication' %}" class="btn btn-primary">+ Nouvelle publication</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% for pub in publications %}
+        <div class="list-item">
+            <div class="list-item-content">
+                <h3>{{ pub.titre }}</h3>
+                <p>{{ pub.contenu|truncatewords:40 }}</p>
+                <p style="font-size: 0.8rem; color: var(--gray-400); margin-top: 0.5rem;">
+                    Par {{ pub.auteur.get_full_name }} · {{ pub.date_creation|date:"d/m/Y" }}
+                </p>
+            </div>
+            {% if user.role == 'bde' or user.role == 'admin_univ' %}
+            <a href="{% url 'campus:modifier_publication' pub.pk %}" class="btn btn-sm btn-outline">✏️ Modifier</a>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="icon">📄</div>
+            <p>Aucune publication pour le moment</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

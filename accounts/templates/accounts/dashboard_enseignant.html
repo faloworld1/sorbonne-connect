@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — Enseignant{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Bonjour {{ user.first_name|default:user.username }} 👋</h1>
+    <p>Espace enseignant — Campus Connect</p>
+    <div class="quick-actions">
+        <a href="{% url 'campus:emploi_du_temps' %}" class="btn">📅 Mes cours</a>
+        <a href="{% url 'campus:creer_cours' %}" class="btn">➕ Ajouter un cours</a>
+        <a href="{% url 'campus:annonces' %}" class="btn">📢 Annonces</a>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>📅 Mes cours</h2>
+            <a href="{% url 'campus:creer_cours' %}" class="btn btn-sm btn-primary">+ Ajouter</a>
+        </div>
+        <div class="card-body">
+            {% load campus_tags %}
+            {% get_cours_for_enseignant user as cours_list %}
+            {% for c in cours_list %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ c.nom }}</h3>
+                    <p>{{ c.get_jour_display }} {{ c.heure_debut|time:"H:i" }}-{{ c.heure_fin|time:"H:i" }} · {{ c.salle }} · {{ c.formation }}</p>
+                </div>
+                <a href="{% url 'campus:emargement' c.pk %}" class="btn btn-sm btn-outline">✅ Émargement</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="icon">📚</div>
+                <p>Aucun cours enregistré</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>📢 Annonces récentes</h2>
+        </div>
+        <div class="card-body">
+            {% get_annonces_for_user user as annonces %}
+            {% for annonce in annonces|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ annonce.titre }}</h3>
+                    <p>{{ annonce.contenu|truncatewords:15 }}</p>
+                </div>
+                <span class="badge badge-{{ annonce.priorite }}">{{ annonce.get_priorite_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="icon">📭</div>
+                <p>Aucune annonce</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

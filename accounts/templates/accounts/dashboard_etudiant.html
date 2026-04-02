@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — Étudiant{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Bonjour {{ user.first_name|default:user.username }} 👋</h1>
+    <p>Bienvenue sur votre espace étudiant — {{ user.formation|default:"Formation non renseignée" }}</p>
+    <div class="quick-actions">
+        <a href="{% url 'campus:emploi_du_temps' %}" class="btn">📅 Emploi du temps</a>
+        <a href="{% url 'campus:evenements' %}" class="btn">🎉 Événements</a>
+        <a href="{% url 'campus:annonces' %}" class="btn">📢 Annonces</a>
+        <a href="{% url 'chatbot:index' %}" class="btn">💬 Chatbot</a>
+    </div>
+</div>
+
+<div class="grid grid-3">
+    <div class="stat-box">
+        <div class="stat-value" id="nb-cours">—</div>
+        <div class="stat-label">Cours cette semaine</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value" id="nb-events">—</div>
+        <div class="stat-label">Événements à venir</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value" id="nb-annonces">—</div>
+        <div class="stat-label">Annonces actives</div>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>📢 Dernières annonces</h2>
+        </div>
+        <div class="card-body">
+            {% load campus_tags %}
+            {% get_annonces_for_user user as annonces %}
+            {% for annonce in annonces|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ annonce.titre }}</h3>
+                    <p>{{ annonce.contenu|truncatewords:20 }}</p>
+                </div>
+                <span class="badge badge-{{ annonce.priorite }}">{{ annonce.get_priorite_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="icon">📭</div>
+                <p>Aucune annonce</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>🎉 Prochains événements</h2>
+        </div>
+        <div class="card-body">
+            {% get_upcoming_events as events %}
+            {% for evt in events|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ evt.titre }}</h3>
+                    <p>{{ evt.date_debut|date:"d/m/Y H:i" }} — {{ evt.lieu }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="icon">📅</div>
+                <p>Aucun événement à venir</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

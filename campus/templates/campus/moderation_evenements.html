@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Modération des événements{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Modération des événements</h1>
+    <a href="{% url 'campus:evenements' %}" class="btn btn-outline">← Retour</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% for evt in evenements %}
+        <div class="list-item">
+            <div class="list-item-content">
+                <h3>{{ evt.titre }}</h3>
+                <p>
+                    {{ evt.date_debut|date:"d/m/Y H:i" }} · {{ evt.lieu }}<br>
+                    Proposé par {{ evt.organisateur.get_full_name }}
+                    {% if evt.association %} ({{ evt.association.nom }}){% endif %}
+                </p>
+                <p style="margin-top: 0.25rem;">{{ evt.description|truncatewords:25 }}</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <form method="post" action="{% url 'campus:valider_evenement' evt.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="approuver" class="btn btn-sm btn-success">✅ Approuver</button>
+                </form>
+                <form method="post" action="{% url 'campus:valider_evenement' evt.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="refuser" class="btn btn-sm btn-danger">❌ Refuser</button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="icon">✅</div>
+            <p>Aucun événement en attente de validation</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

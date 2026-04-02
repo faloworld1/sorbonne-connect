@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — BDE{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Espace BDE 🎓</h1>
+    <p>Gérez les publications et événements du Bureau Des Étudiants</p>
+    <div class="quick-actions">
+        <a href="{% url 'campus:creer_publication' %}" class="btn">📝 Nouvelle publication</a>
+        <a href="{% url 'campus:creer_evenement' %}" class="btn">🎉 Créer un événement</a>
+        <a href="{% url 'campus:moderer_evenements' %}" class="btn">⚙️ Modérer</a>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>📝 Publications récentes</h2>
+            <a href="{% url 'campus:creer_publication' %}" class="btn btn-sm btn-primary">+ Nouvelle</a>
+        </div>
+        <div class="card-body">
+            {% load campus_tags %}
+            {% get_recent_publications as pubs %}
+            {% for pub in pubs|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ pub.titre }}</h3>
+                    <p>{{ pub.contenu|truncatewords:15 }} · {{ pub.date_creation|date:"d/m/Y" }}</p>
+                </div>
+                <span class="badge badge-{{ pub.statut }}">{{ pub.get_statut_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state"><div class="icon">📄</div><p>Aucune publication</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>⏳ Événements en attente</h2>
+        </div>
+        <div class="card-body">
+            {% get_pending_events as pending %}
+            {% for evt in pending|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ evt.titre }}</h3>
+                    <p>{{ evt.date_debut|date:"d/m/Y H:i" }} — {{ evt.organisateur.get_full_name }}</p>
+                </div>
+                <span class="badge badge-en_attente">En attente</span>
+            </div>
+            {% empty %}
+            <div class="empty-state"><div class="icon">✅</div><p>Rien à modérer</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

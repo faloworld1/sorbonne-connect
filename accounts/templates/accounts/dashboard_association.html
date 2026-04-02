@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord — Association{% endblock %}
+
+{% block content %}
+<div class="dashboard-welcome">
+    <h1>Espace Association 🤝</h1>
+    <p>Gérez votre association et ses événements</p>
+    <div class="quick-actions">
+        <a href="{% url 'campus:creer_association' %}" class="btn">🏠 Créer une association</a>
+        <a href="{% url 'campus:creer_evenement' %}" class="btn">🎉 Proposer un événement</a>
+        <a href="{% url 'campus:associations' %}" class="btn">📋 Toutes les associations</a>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+        <div class="card-header">
+            <h2>🏠 Mes associations</h2>
+        </div>
+        <div class="card-body">
+            {% load campus_tags %}
+            {% get_user_associations user as mes_assos %}
+            {% for asso in mes_assos %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ asso.nom }}</h3>
+                    <p>{{ asso.description|truncatewords:15 }}</p>
+                </div>
+                <div class="list-item-meta">{{ asso.membres.count }} membres</div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="icon">🏠</div>
+                <p>Aucune association gérée</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>🎉 Mes événements</h2>
+        </div>
+        <div class="card-body">
+            {% get_user_events user as mes_events %}
+            {% for evt in mes_events|slice:":5" %}
+            <div class="list-item">
+                <div class="list-item-content">
+                    <h3>{{ evt.titre }}</h3>
+                    <p>{{ evt.date_debut|date:"d/m/Y" }} — {{ evt.lieu }}</p>
+                </div>
+                <span class="badge badge-{{ evt.statut }}">{{ evt.get_statut_display }}</span>
+            </div>
+            {% empty %}
+            <div class="empty-state"><div class="icon">📅</div><p>Aucun événement</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

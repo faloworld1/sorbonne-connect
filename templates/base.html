@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Campus Connect{% endblock %} — USPN</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/">🎓 Campus Connect</a>
+        </div>
+        <div class="navbar-menu">
+            {% if user.is_authenticated %}
+                <a href="{% url 'accounts:dashboard' %}" class="nav-link">Tableau de bord</a>
+                <a href="{% url 'campus:evenements' %}" class="nav-link">Événements</a>
+                <a href="{% url 'campus:publications' %}" class="nav-link">Publications</a>
+                <a href="{% url 'campus:associations' %}" class="nav-link">Associations</a>
+                <a href="{% url 'campus:annonces' %}" class="nav-link">Annonces</a>
+                <a href="{% url 'campus:emploi_du_temps' %}" class="nav-link">Emploi du temps</a>
+                <a href="{% url 'chatbot:index' %}" class="nav-link">💬 Chatbot</a>
+                {% if user.is_superuser or user.role == 'admin_univ' %}
+                    <a href="{% url 'reporting:dashboard' %}" class="nav-link nav-reporting">📊 Reporting</a>
+                {% endif %}
+                <div class="nav-user">
+                    <a href="{% url 'accounts:profil' %}" class="nav-link">{{ user.get_full_name|default:user.username }}</a>
+                    <span class="badge badge-{{ user.role }}">{{ user.get_role_display }}</span>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline">Déconnexion</a>
+                </div>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-sm">Connexion</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-sm btn-outline">Inscription</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Messages Django -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contenu principal -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Campus Connect — Université Sorbonne Paris Nord © 2026</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

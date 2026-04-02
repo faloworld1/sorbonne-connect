@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Événements{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>🎉 Événements</h1>
+    <div>
+        <a href="{% url 'campus:creer_evenement' %}" class="btn btn-primary">+ Proposer un événement</a>
+        {% if user.role == 'admin_univ' or user.role == 'bde' %}
+        <a href="{% url 'campus:moderer_evenements' %}" class="btn btn-outline">⚙️ Modérer</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% for evt in evenements %}
+        <div class="list-item">
+            <div class="list-item-content">
+                <h3>{{ evt.titre }}</h3>
+                <p>
+                    📅 {{ evt.date_debut|date:"d/m/Y H:i" }} → {{ evt.date_fin|date:"d/m/Y H:i" }}<br>
+                    📍 {{ evt.lieu }}
+                    {% if evt.association %} · 🏠 {{ evt.association.nom }}{% endif %}
+                    · Organisé par {{ evt.organisateur.get_full_name }}
+                </p>
+                <p style="margin-top: 0.5rem;">{{ evt.description|truncatewords:30 }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="icon">🎉</div>
+            <p>Aucun événement approuvé pour le moment</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -17,7 +17,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
     'chatbot',
+    'campus',
+    'reporting',
 ]
 
 MIDDLEWARE = [
@@ -35,7 +38,7 @@ ROOT_URLCONF = 'sorbonne_connect.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -63,6 +66,18 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Modèle utilisateur personnalisé
+AUTH_USER_MODEL = 'accounts.Utilisateur'
+
+# Redirections d'authentification
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Clé API pour les exports Power BI (connexion directe sans session)
+POWERBI_API_KEY = os.environ.get('POWERBI_API_KEY', 'campus-connect-powerbi-2026')
