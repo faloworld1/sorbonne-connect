@@ -1,0 +1,22 @@
+﻿Nom Filière,statut_appel,Count of id,matiere
+,Présent,191,Management
+,Présent,190,Droit du travail
+,Présent,188,Anglais
+,Présent,166,Base de données
+,Présent,159,Comptabilité
+,Présent,148,Réseaux
+,Présent,143,Algorithmique
+,Absent,39,Droit du travail
+,Absent,37,Réseaux
+,Absent,35,Algorithmique
+,Absent,33,Anglais
+,Absent,26,Management
+,Absent,23,Base de données
+,Absent,21,Comptabilité
+,Retard,20,Comptabilité
+,Retard,18,Réseaux
+,Retard,16,Management
+,Retard,13,Algorithmique
+,Retard,13,Anglais
+,Retard,11,Base de données
+,Retard,10,Droit du travail

@@ -1,0 +1,2092 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campus Connect – Université Sorbonne Paris Nord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   DESIGN TOKENS
+========================================================= */
+:root {
+  --navy:       #1B2D6B;
+  --navy-dark:  #111e4a;
+  --navy-light: #2a3f8f;
+  --orange:     #E8581A;
+  --orange-lt:  #F5763A;
+  --orange-bg:  #FFF0E8;
+  --bg:         #F0F3FA;
+  --surface:    #FFFFFF;
+  --surface-2:  #F7F9FD;
+  --border:     #DDE3F0;
+  --text:       #1A1F36;
+  --text-2:     #5A6282;
+  --text-3:     #9AA3C2;
+  --green:      #1DA062;
+  --green-bg:   #E8F7F0;
+  --red:        #D63B3B;
+  --red-bg:     #FDEAEA;
+  --yellow:     #D4840A;
+  --yellow-bg:  #FEF3DC;
+  --radius:     12px;
+  --radius-lg:  18px;
+  --shadow:     0 2px 16px rgba(27,45,107,0.10);
+  --shadow-lg:  0 8px 32px rgba(27,45,107,0.14);
+}
+
+/* RESET & BASE */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+h1,h2,h3 { font-family: 'Libre Baskerville', serif; }
+a { color: inherit; text-decoration: none; }
+button { font-family: 'Outfit', sans-serif; cursor: pointer; border: none; outline: none; }
+img { display: block; max-width: 100%; }
+
+/* VIEWS */
+.view { display: none; min-height: 100vh; }
+.view.active { display: flex; flex-direction: column; }
+
+/* =========================================================
+   LOGIN PAGE
+========================================================= */
+#login-view {
+  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 55%, var(--navy-light) 100%);
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+#login-view::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 420px; height: 420px;
+  background: var(--orange);
+  opacity: .07;
+  border-radius: 50%;
+}
+#login-view::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -80px;
+  width: 280px; height: 280px;
+  background: var(--orange);
+  opacity: .05;
+  border-radius: 50%;
+}
+
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 440px;
+  padding: 44px 40px 36px;
+  position: relative;
+  z-index: 1;
+  animation: slideUp .5s ease;
+}
+@keyframes slideUp {
+  from { opacity:0; transform: translateY(24px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.login-logo {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.login-logo-icon {
+  width: 48px; height: 48px;
+  background: var(--navy);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.login-logo-icon svg { width: 28px; height: 28px; }
+.login-logo-text h1 { font-size: 1.3rem; color: var(--navy); line-height: 1.2; }
+.login-logo-text p  { font-size: .72rem; color: var(--text-2); font-family: 'Outfit', sans-serif; font-weight: 500; letter-spacing: .02em; }
+.login-tagline { font-size: .85rem; color: var(--text-2); margin-bottom: 28px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: .8rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; letter-spacing: .02em; }
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .9rem;
+  color: var(--text);
+  background: var(--surface-2);
+  transition: border-color .2s;
+}
+.form-group input:focus { border-color: var(--navy); outline: none; background: #fff; }
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 8px;
+  font-size: .95rem;
+  font-weight: 600;
+  margin-top: 8px;
+  transition: background .2s, transform .1s;
+}
+.btn-primary:hover { background: var(--orange-lt); }
+.btn-primary:active { transform: scale(.98); }
+.login-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 16px;
+  font-size: .78rem; color: var(--text-3);
+}
+.login-divider::before, .login-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.demo-roles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.demo-role-btn {
+  padding: 9px 8px;
+  border-radius: 8px;
+  font-size: .8rem;
+  font-weight: 600;
+  transition: all .18s;
+  display: flex; align-items: center; gap: 7px;
+  border: 1.5px solid transparent;
+}
+.demo-role-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+.demo-role-btn.student  { background: #EAF0FF; color: var(--navy); border-color: #C4D2F0; }
+.demo-role-btn.teacher  { background: var(--green-bg); color: #145c3a; border-color: #b4e4cf; }
+.demo-role-btn.bde      { background: var(--orange-bg); color: #8a2e04; border-color: #f5c4a5; }
+.demo-role-btn.asso     { background: var(--yellow-bg); color: #7a4a02; border-color: #f0d090; }
+.demo-role-btn.admin    { background: var(--red-bg); color: #7a1818; border-color: #f0b0b0; grid-column: span 2; justify-content: center; }
+.demo-role-icon { font-size: 1rem; }
+
+/* =========================================================
+   APP SHELL
+========================================================= */
+#app-view { background: var(--bg); flex-direction: column; }
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  height: 60px;
+  gap: 14px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 1px 8px rgba(27,45,107,.06);
+}
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: .95rem;
+  color: var(--navy);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.topbar-logo-dot { width: 8px; height: 8px; background: var(--orange); border-radius: 50%; }
+.topbar-badge {
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.badge-student  { background: #EAF0FF; color: var(--navy); }
+.badge-teacher  { background: var(--green-bg); color: #145c3a; }
+.badge-bde      { background: var(--orange-bg); color: #8a2e04; }
+.badge-asso     { background: var(--yellow-bg); color: #7a4a02; }
+.badge-admin    { background: var(--red-bg); color: #7a1818; }
+.topbar-spacer  { flex: 1; }
+.topbar-notif {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+.notif-dot {
+  width: 8px; height: 8px;
+  background: var(--orange);
+  border-radius: 50%;
+  position: absolute;
+  top: 4px; right: 4px;
+  border: 1.5px solid #fff;
+}
+.topbar-user {
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer;
+}
+.topbar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.topbar-name { font-size: .85rem; font-weight: 600; color: var(--text); }
+.topbar-role { font-size: .72rem; color: var(--text-2); }
+.btn-logout {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text-2);
+  transition: all .18s;
+}
+.btn-logout:hover { border-color: var(--orange); color: var(--orange); }
+
+/* CONTENT AREA */
+.content-area { flex: 1; display: flex; flex-direction: column; max-width: 1100px; margin: 0 auto; width: 100%; padding: 28px 24px; }
+
+/* TAB NAV */
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 5px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn {
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--text-2);
+  background: transparent;
+  white-space: nowrap;
+  transition: all .18s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab-btn:hover { color: var(--navy); background: var(--bg); }
+.tab-btn.active { background: var(--navy); color: #fff; box-shadow: 0 2px 8px rgba(27,45,107,.2); }
+.tab-content { display: none; animation: fadeIn .22s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+/* CARDS & GRID */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width:760px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.stat-icon.navy  { background: #EAF0FF; }
+.stat-icon.green { background: var(--green-bg); }
+.stat-icon.orange { background: var(--orange-bg); }
+.stat-icon.red   { background: var(--red-bg); }
+.stat-val { font-size: 1.5rem; font-weight: 700; color: var(--navy); line-height: 1; }
+.stat-lbl { font-size: .78rem; color: var(--text-2); margin-top: 2px; }
+
+/* SECTION HEADERS */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-family: 'Libre Baskerville', serif; font-size: 1.05rem; color: var(--navy); }
+.btn-sm {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: .78rem;
+  font-weight: 600;
+  background: var(--orange-bg);
+  color: var(--orange);
+  border: 1.5px solid #f0c4a5;
+  transition: all .18s;
+}
+.btn-sm:hover { background: var(--orange); color: #fff; }
+.btn-sm.navy { background: #EAF0FF; color: var(--navy); border-color: #c4d2f0; }
+.btn-sm.navy:hover { background: var(--navy); color: #fff; }
+.btn-sm.green { background: var(--green-bg); color: var(--green); border-color: #b4e4cf; }
+.btn-sm.green:hover { background: var(--green); color: #fff; }
+
+/* LIST ITEMS */
+.list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.list-item:last-child { border-bottom: none; }
+.list-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.list-info { flex: 1; min-width: 0; }
+.list-name { font-size: .88rem; font-weight: 600; color: var(--text); }
+.list-sub  { font-size: .76rem; color: var(--text-2); }
+.list-meta { font-size: .76rem; color: var(--text-2); white-space: nowrap; text-align: right; }
+
+/* STATUS BADGES */
+.status {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+}
+.status::before { content: '●'; font-size: .5rem; }
+.status.present  { background: var(--green-bg); color: var(--green); }
+.status.absent   { background: var(--red-bg); color: var(--red); }
+.status.late     { background: var(--yellow-bg); color: var(--yellow); }
+.status.pending  { background: #EAF0FF; color: var(--navy); }
+.status.validated { background: var(--green-bg); color: var(--green); }
+.status.refused  { background: var(--red-bg); color: var(--red); }
+
+/* EVENT CARDS */
+.event-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform .18s, box-shadow .18s;
+  cursor: pointer;
+}
+.event-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.event-cover {
+  height: 110px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+}
+.event-body { padding: 14px; }
+.event-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.event-name { font-weight: 700; font-size: .9rem; color: var(--text); margin-bottom: 4px; }
+.event-meta { font-size: .75rem; color: var(--text-2); }
+
+/* SCHEDULE / TIMETABLE */
+.schedule-item {
+  display: flex; align-items: stretch; gap: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 10px;
+  transition: box-shadow .18s;
+}
+.schedule-item:hover { box-shadow: var(--shadow); }
+.schedule-side { width: 5px; flex-shrink: 0; }
+.schedule-body {
+  flex: 1;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.schedule-time { font-size: .78rem; color: var(--text-2); width: 80px; flex-shrink: 0; }
+.schedule-info { flex: 1; }
+.schedule-name { font-weight: 700; font-size: .9rem; color: var(--text); }
+.schedule-sub  { font-size: .76rem; color: var(--text-2); margin-top: 2px; }
+.schedule-action { flex-shrink: 0; }
+
+/* ATTENDANCE TABLE */
+.att-table { width: 100%; border-collapse: collapse; }
+.att-table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--surface-2);
+}
+.att-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: .85rem;
+}
+.att-table tr:last-child td { border-bottom: none; }
+.att-table tr:hover td { background: var(--bg); }
+.toggle-status { display: flex; gap: 4px; }
+.ts-btn {
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: .72rem;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  transition: all .15s;
+}
+.ts-btn.p { background: var(--green-bg); color: var(--green); border-color: #b4e4cf; }
+.ts-btn.a { background: var(--red-bg); color: var(--red); border-color: #f0b0b0; }
+.ts-btn.r { background: var(--yellow-bg); color: var(--yellow); border-color: #f0d090; }
+.ts-btn.active { opacity: 1; }
+.ts-btn:not(.active) { opacity: .4; }
+.ts-btn:hover { opacity: 1; }
+
+/* ALERT BANNER */
+.alert-banner {
+  background: var(--red-bg);
+  border: 1.5px solid #f0b0b0;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.alert-icon { font-size: 1.3rem; flex-shrink: 0; }
+.alert-text { font-size: .85rem; color: var(--red); font-weight: 600; }
+.alert-text span { font-weight: 400; }
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .4s ease;
+}
+
+/* CHATBOT BUTTON */
+.chatbot-fab {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 54px; height: 54px;
+  background: var(--navy);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 20px rgba(27,45,107,.35);
+  cursor: pointer;
+  z-index: 200;
+  transition: transform .2s, background .2s;
+}
+.chatbot-fab:hover { background: var(--orange); transform: scale(1.07); }
+
+.chatbot-panel {
+  position: fixed;
+  bottom: 94px; right: 28px;
+  width: 340px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1.5px solid var(--border);
+  z-index: 201;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp .25s ease;
+}
+.chatbot-panel.open { display: flex; }
+.chatbot-header {
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.chatbot-header-info h4 { font-size: .9rem; font-weight: 700; }
+.chatbot-header-info p  { font-size: .72rem; opacity: .7; }
+.chatbot-messages {
+  flex: 1;
+  padding: 16px;
+  height: 260px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.chat-msg {
+  max-width: 85%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: .82rem;
+  line-height: 1.45;
+}
+.chat-msg.bot { background: var(--bg); color: var(--text); align-self: flex-start; border-bottom-left-radius: 3px; }
+.chat-msg.user { background: var(--navy); color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+.chat-msg.typing { font-style: italic; color: var(--text-2); }
+.chatbot-input {
+  display: flex; gap: 8px;
+  padding: 12px;
+  border-top: 1.5px solid var(--border);
+}
+.chatbot-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-family: 'Outfit', sans-serif;
+  font-size: .82rem;
+}
+.chatbot-input input:focus { outline: none; border-color: var(--navy); }
+.chatbot-send {
+  width: 34px; height: 34px;
+  background: var(--orange);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* FORM ELEMENTS */
+.form-section { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; }
+.field { margin-bottom: 18px; }
+.field label { display: block; font-size: .8rem; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+.field input, .field textarea, .field select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .88rem;
+  color: var(--text);
+  background: var(--surface-2);
+  transition: border-color .2s;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--navy); outline: none; background: #fff; }
+.field textarea { min-height: 90px; resize: vertical; }
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  color: var(--text-2);
+  font-size: .85rem;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.upload-area:hover { border-color: var(--navy); }
+.upload-area .icon { font-size: 2rem; margin-bottom: 8px; }
+.btn-full {
+  width: 100%;
+  padding: 13px;
+  border-radius: 8px;
+  font-size: .92rem;
+  font-weight: 700;
+  background: var(--navy);
+  color: #fff;
+  transition: background .2s;
+}
+.btn-full:hover { background: var(--navy-dark); }
+.btn-full.orange { background: var(--orange); }
+.btn-full.orange:hover { background: var(--orange-lt); }
+
+/* ADMIN TABLE */
+.mod-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mod-item:last-child { border-bottom: none; }
+.mod-emoji { font-size: 1.6rem; width: 44px; height: 44px; background: var(--bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.mod-info { flex: 1; min-width: 0; }
+.mod-name { font-weight: 700; font-size: .88rem; color: var(--text); }
+.mod-sub { font-size: .75rem; color: var(--text-2); }
+.mod-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-validate { padding: 5px 12px; border-radius: 6px; font-size: .75rem; font-weight: 700; background: var(--green-bg); color: var(--green); border: 1.5px solid #b4e4cf; transition: all .15s; }
+.btn-validate:hover { background: var(--green); color: #fff; }
+.btn-refuse { padding: 5px 12px; border-radius: 6px; font-size: .75rem; font-weight: 700; background: var(--red-bg); color: var(--red); border: 1.5px solid #f0b0b0; transition: all .15s; }
+.btn-refuse:hover { background: var(--red); color: #fff; }
+
+/* KPI */
+.kpi-ring { display: flex; align-items: center; gap: 14px; }
+.ring-chart {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .95rem;
+  font-weight: 700;
+  position: relative;
+}
+.ring-info .ring-title { font-size: .88rem; font-weight: 700; color: var(--text); }
+.ring-info .ring-sub   { font-size: .75rem; color: var(--text-2); }
+
+/* CULTURAL TAGS */
+.tag-cinema  { background: #EDE4FF; color: #5B21B6; }
+.tag-expo    { background: #E0F7FA; color: #0277BD; }
+.tag-sport   { background: #E8F5E9; color: #2E7D32; }
+.tag-soiree  { background: var(--orange-bg); color: var(--orange); }
+.tag-asso    { background: var(--yellow-bg); color: var(--yellow); }
+.tag-admin   { background: var(--red-bg); color: var(--red); }
+.cover-cinema  { background: linear-gradient(135deg, #4A148C, #7B1FA2); }
+.cover-expo    { background: linear-gradient(135deg, #0277BD, #0097A7); }
+.cover-sport   { background: linear-gradient(135deg, #2E7D32, #388E3C); }
+.cover-soiree  { background: linear-gradient(135deg, #E65100, #F57C00); }
+.cover-asso    { background: linear-gradient(135deg, #F57F17, #FBC02D); }
+.cover-bde     { background: linear-gradient(135deg, #1B2D6B, #2a3f8f); }
+
+.week-header {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text-3);
+  margin: 20px 0 10px;
+}
+.week-header:first-child { margin-top: 0; }
+
+/* BACK OFFICE */
+.admin-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.admin-row:last-child { border-bottom: none; }
+.admin-info { flex: 1; min-width: 0; }
+.admin-name { font-weight: 700; font-size: .88rem; color: var(--text); }
+.admin-meta { font-size: .74rem; color: var(--text-2); }
+.btn-danger { padding: 4px 10px; border-radius: 5px; font-size: .72rem; font-weight: 700; background: var(--red-bg); color: var(--red); border: 1.5px solid #f0b0b0; transition: all .15s; }
+.btn-danger:hover { background: var(--red); color: #fff; }
+.btn-edit { padding: 4px 10px; border-radius: 5px; font-size: .72rem; font-weight: 700; background: #EAF0FF; color: var(--navy); border: 1.5px solid #c4d2f0; transition: all .15s; }
+.btn-edit:hover { background: var(--navy); color: #fff; }
+
+/* WELCOME STRIP */
+.welcome-strip {
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy-light) 100%);
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  color: #fff;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+  overflow: hidden;
+  position: relative;
+}
+.welcome-strip::after {
+  content: ''; position: absolute;
+  right: -40px; top: -40px;
+  width: 160px; height: 160px;
+  background: var(--orange); opacity: .13;
+  border-radius: 50%;
+}
+.welcome-strip h2 { font-family: 'Libre Baskerville', serif; font-size: 1.15rem; margin-bottom: 4px; }
+.welcome-strip p  { font-size: .82rem; opacity: .75; }
+.welcome-strip-icon { font-size: 2.5rem; position: relative; z-index: 1; }
+
+/* EMBEDDED CHATBOT TAB */
+.chatbot-embedded {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  box-shadow: var(--shadow);
+}
+.chatbot-embedded .chatbot-header {
+  border-radius: 0;
+}
+.chatbot-embedded .chatbot-messages {
+  flex: 1;
+  height: auto;
+  padding: 20px;
+}
+.chatbot-embedded .chatbot-input {
+  padding: 14px 16px;
+}
+.chatbot-embedded .chatbot-input input {
+  padding: 10px 14px;
+  font-size: .88rem;
+}
+.chatbot-embedded .chat-msg {
+  max-width: 80%;
+  font-size: .86rem;
+}
+.chatbot-embedded .chatbot-send {
+  width: 38px;
+  height: 38px;
+}
+.chatbot-quick-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 20px 12px;
+}
+.chatbot-quick-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 600;
+  background: var(--bg);
+  color: var(--navy);
+  border: 1.5px solid var(--border);
+  transition: all .15s;
+}
+.chatbot-quick-btn:hover {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* LOGIN ERROR */
+.login-error {
+  background: var(--red-bg);
+  color: var(--red);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+.login-error.show { display: flex; }
+
+/* CREDENTIALS TABLE */
+.creds-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: .72rem;
+}
+.creds-table th {
+  text-align: left;
+  padding: 6px 8px;
+  background: var(--bg);
+  color: var(--text-2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-bottom: 1.5px solid var(--border);
+}
+.creds-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+}
+.creds-table tr:hover td {
+  background: var(--surface-2);
+  cursor: pointer;
+}
+.creds-table .role-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: .65rem;
+  font-weight: 700;
+}
+
+/* DJANGO BADGE */
+.django-badge {
+  position: fixed;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  background: #0C4B33;
+  color: #44B78B;
+  padding: 2px 12px;
+  border-radius: 0 0 8px 8px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  z-index: 999;
+  font-family: monospace;
+}
+</style>
+</head>
+<body>
+
+<div class="django-badge">⚡ DJANGO BACKEND</div>
+
+<!-- ===================== LOGIN VIEW ===================== -->
+<div id="login-view" class="view active">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="10" r="6" fill="#E8581A"/>
+          <path d="M4 24c0-5.523 4.477-10 10-10s10 4.477 10 10" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          <circle cx="14" cy="10" r="3" fill="white" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="login-logo-text">
+        <h1>Campus Connect</h1>
+        <p>Université Sorbonne Paris Nord</p>
+      </div>
+    </div>
+    <p class="login-tagline">Votre portail universitaire unifié — information, présences et vie du campus.</p>
+
+    <div class="login-error" id="login-error">⚠️ <span id="login-error-msg">Identifiants incorrects</span></div>
+
+    <div class="form-group">
+      <label>Adresse e-mail institutionnelle</label>
+      <input type="email" placeholder="prenom.nom@etu.sorbonne.fr" id="login-email">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" placeholder="••••••••" id="login-password" onkeydown="if(event.key==='Enter')handleLogin()">
+    </div>
+    <button class="btn-primary" onclick="handleLogin()">Se connecter</button>
+
+    <div class="login-divider">Identifiants de démonstration</div>
+    <table class="creds-table" id="creds-table">
+      <thead><tr><th>Rôle</th><th>E-mail</th><th>Mot de passe</th></tr></thead>
+      <tbody>
+        <tr onclick="fillLogin('jean.dupont@etu.sorbonne.fr','etudiant123')">
+          <td><span class="role-tag" style="background:#EAF0FF;color:var(--navy)">🎓 Étudiant</span></td>
+          <td>jean.dupont@etu.sorbonne.fr</td><td>etudiant123</td>
+        </tr>
+        <tr onclick="fillLogin('m.rousseau@sorbonne.fr','enseignant123')">
+          <td><span class="role-tag" style="background:var(--green-bg);color:#145c3a">📋 Enseignant</span></td>
+          <td>m.rousseau@sorbonne.fr</td><td>enseignant123</td>
+        </tr>
+        <tr onclick="fillLogin('lea.martin@etu.sorbonne.fr','bde123')">
+          <td><span class="role-tag" style="background:var(--orange-bg);color:#8a2e04">🎉 BDE</span></td>
+          <td>lea.martin@etu.sorbonne.fr</td><td>bde123</td>
+        </tr>
+        <tr onclick="fillLogin('kevin.tran@etu.sorbonne.fr','asso123')">
+          <td><span class="role-tag" style="background:var(--yellow-bg);color:#7a4a02">🤝 Association</span></td>
+          <td>kevin.tran@etu.sorbonne.fr</td><td>asso123</td>
+        </tr>
+        <tr onclick="fillLogin('admin@sorbonne.fr','admin123')">
+          <td><span class="role-tag" style="background:var(--red-bg);color:#7a1818">🔒 Admin</span></td>
+          <td>admin@sorbonne.fr</td><td>admin123</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== APP VIEW ===================== -->
+<div id="app-view" class="view">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-logo-dot"></div>
+      Campus Connect
+    </div>
+    <span id="topbar-badge" class="topbar-badge"></span>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-notif">🔔<span class="notif-dot"></span></div>
+    <div class="topbar-user">
+      <div class="topbar-avatar" id="topbar-avatar">JD</div>
+      <div>
+        <div class="topbar-name" id="topbar-name">Jean Dupont</div>
+        <div class="topbar-role" id="topbar-role">Étudiant</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- ============ STUDENT SPACE ============ -->
+    <div id="space-student" class="space" style="display:none">
+      <div class="welcome-strip">
+        <div>
+          <h2>Bonjour, Jean 👋</h2>
+          <p>Master Big Data — Université Sorbonne Paris Nord</p>
+        </div>
+        <div class="welcome-strip-icon">🎓</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('student','scolaire',this)">📚 Scolaire</button>
+        <button class="tab-btn" onclick="switchTab('student','associatif',this)">🤝 Associatif</button>
+        <button class="tab-btn" onclick="switchTab('student','bde',this)">🎉 BDE</button>
+        <button class="tab-btn" onclick="switchTab('student','culture',this)">🎭 Culturel & Local</button>
+        <button class="tab-btn" onclick="switchTab('student','admin',this)">📢 Administratif</button>
+        <button class="tab-btn" onclick="switchTab('student','chatbot',this)">🤖 Chatbot IA</button>
+      </div>
+
+      <!-- Scolaire -->
+      <div id="student-scolaire" class="tab-content active">
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-icon navy">📅</div>
+            <div><div class="stat-val">3</div><div class="stat-lbl">Cours cette semaine</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div><div class="stat-val">87%</div><div class="stat-lbl">Taux de présence</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">📝</div>
+            <div><div class="stat-val">2</div><div class="stat-lbl">Annonces non lues</div></div>
+          </div>
+        </div>
+
+        <div class="section-header"><div class="section-title">Emploi du temps — Semaine en cours</div></div>
+        <div style="margin-bottom:20px">
+          <div class="week-header">Lundi 23 mars</div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#E8581A"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">08h00 – 10h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Algorithmique avancée</div>
+                <div class="schedule-sub">Salle B204 · M. Laurent</div>
+              </div>
+              <span class="status present">Présent</span>
+            </div>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#1B2D6B"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">14h00 – 16h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Machine Learning</div>
+                <div class="schedule-sub">Amphi A · Mme Rousseau</div>
+              </div>
+              <span class="status present">Présent</span>
+            </div>
+          </div>
+          <div class="week-header">Mercredi 25 mars</div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#1DA062"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">10h00 – 12h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Data Visualisation</div>
+                <div class="schedule-sub">Salle Info C12 · M. Bernard</div>
+              </div>
+              <span class="status pending">À venir</span>
+            </div>
+          </div>
+          <div class="week-header">Vendredi 27 mars</div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#D4840A"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">08h00 – 10h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Gestion de projet numérique</div>
+                <div class="schedule-sub">Salle B102 · M. Garcia</div>
+              </div>
+              <span class="status absent">Absent</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Associatif -->
+      <div id="student-associatif" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Vie associative</div>
+          <button class="btn-sm">Filtrer</button>
+        </div>
+        <div class="grid-3">
+          <div class="event-card">
+            <div class="event-cover cover-asso">🤝</div>
+            <div class="event-body">
+              <span class="event-tag tag-asso">Association</span>
+              <div class="event-name">Forum des associations</div>
+              <div class="event-meta">📅 25 mars · 12h–18h · Hall principal</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-sport">🏸</div>
+            <div class="event-body">
+              <span class="event-tag tag-sport">Sport</span>
+              <div class="event-name">Tournoi de Badminton</div>
+              <div class="event-meta">📅 28 mars · 14h–18h · Gymnase</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-bde">🎙️</div>
+            <div class="event-body">
+              <span class="event-tag tag-asso">Bénévolat</span>
+              <div class="event-name">Collecte solidaire Resto du Cœur</div>
+              <div class="event-meta">📅 30 mars · 10h–17h · Parvis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BDE -->
+      <div id="student-bde" class="tab-content">
+        <div class="alert-banner">
+          <span class="alert-icon">📢</span>
+          <div>
+            <div class="alert-text">Soirée de printemps BDE — <span>Vendredi 4 avril à 21h, Salle des fêtes Épinay. Places limitées !</span></div>
+          </div>
+        </div>
+        <div class="section-header">
+          <div class="section-title">Publications BDE</div>
+          <button class="btn-sm">Tout voir</button>
+        </div>
+        <div class="grid-3">
+          <div class="event-card">
+            <div class="event-cover cover-soiree">🎶</div>
+            <div class="event-body">
+              <span class="event-tag tag-soiree">Soirée</span>
+              <div class="event-name">Soirée de Printemps BDE</div>
+              <div class="event-meta">📅 4 avr · 21h · Salle des fêtes</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-bde">🧠</div>
+            <div class="event-body">
+              <span class="event-tag tag-asso">Conférence</span>
+              <div class="event-name">Conférence : IA & Emploi</div>
+              <div class="event-meta">📅 2 avr · 14h · Amphi A</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-asso">☀️</div>
+            <div class="event-body">
+              <span class="event-tag tag-sport">Campus</span>
+              <div class="event-name">Journée cohésion BDE</div>
+              <div class="event-meta">📅 8 avr · 11h · Esplanade</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Culturel -->
+      <div id="student-culture" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Sortir à Épinay-sur-Seine</div>
+          <button class="btn-sm">Filtrer par type</button>
+        </div>
+        <div class="grid-3">
+          <div class="event-card">
+            <div class="event-cover cover-cinema">🎬</div>
+            <div class="event-body">
+              <span class="event-tag tag-cinema">Cinéma</span>
+              <div class="event-name">Ciné-club : Épinay Art & Essai</div>
+              <div class="event-meta">📅 Tous les mercredis · 19h · Centre Culturel</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-expo">🎨</div>
+            <div class="event-body">
+              <span class="event-tag tag-expo">Exposition</span>
+              <div class="event-name">Expo photo : Regards croisés</div>
+              <div class="event-meta">📅 1–15 avr · Médiathèque Colette</div>
+            </div>
+          </div>
+          <div class="event-card">
+            <div class="event-cover cover-sport">🎵</div>
+            <div class="event-body">
+              <span class="event-tag tag-sport">Concert</span>
+              <div class="event-name">Jazz au Parc · Festival gratuit</div>
+              <div class="event-meta">📅 12 avr · 17h · Parc de la Briche</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Administratif -->
+      <div id="student-admin" class="tab-content">
+        <div class="alert-banner">
+          <span class="alert-icon">📢</span>
+          <div class="alert-text">Campagne de bourses CROUS — <span>Date limite le 31 mai. Pensez à constituer votre dossier dès maintenant.</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Informations administratives</div>
+          <div class="list-item">
+            <div class="list-icon" style="background:#EAF0FF">📋</div>
+            <div class="list-info">
+              <div class="list-name">Inscriptions pédagogiques ouvertes</div>
+              <div class="list-sub">Du 1er au 30 juin · ENT Sorbonne Paris Nord</div>
+            </div>
+            <div class="list-meta">Nouveau</div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--orange-bg)">📄</div>
+            <div class="list-info">
+              <div class="list-name">Convention de stage — procédure mise à jour</div>
+              <div class="list-sub">Bureau A104 · Délai 5 jours ouvrés</div>
+            </div>
+            <div class="list-meta">17 mars</div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--green-bg)">🏥</div>
+            <div class="list-info">
+              <div class="list-name">Service de santé universitaire — horaires élargis</div>
+              <div class="list-sub">Bâtiment A · 9h–17h du lundi au vendredi</div>
+            </div>
+            <div class="list-meta">12 mars</div>
+          </div>
+        </div>
+      </div>
+      <!-- Chatbot IA -->
+      <div id="student-chatbot" class="tab-content">
+        <div class="chatbot-embedded">
+          <div class="chatbot-header">
+            <span style="font-size:1.4rem">🤖</span>
+            <div class="chatbot-header-info">
+              <h4>Assistant Campus Connect</h4>
+              <p>Réponse IA · Django Backend · Base de 30 questions</p>
+            </div>
+          </div>
+          <div class="chatbot-messages" id="embedded-chatbot-msgs">
+            <div class="chat-msg bot">Bonjour ! Je suis votre assistant Campus Connect. 👋</div>
+            <div class="chat-msg bot">Posez-moi vos questions sur la scolarité, les bourses, les stages, la vie étudiante, le campus ou le numérique.</div>
+          </div>
+          <div class="chatbot-quick-btns">
+            <button class="chatbot-quick-btn" onclick="quickChat('Comment obtenir une convention de stage ?')">📄 Convention de stage</button>
+            <button class="chatbot-quick-btn" onclick="quickChat('Comment renouveler ma bourse CROUS ?')">💰 Bourse CROUS</button>
+            <button class="chatbot-quick-btn" onclick="quickChat('Où se trouve la bibliothèque ?')">📚 Bibliothèque</button>
+            <button class="chatbot-quick-btn" onclick="quickChat('Comment accéder au Wi-Fi ?')">📶 Wi-Fi campus</button>
+            <button class="chatbot-quick-btn" onclick="quickChat('Quels sont les horaires du secrétariat ?')">🕐 Horaires</button>
+          </div>
+          <div class="chatbot-input">
+            <input type="text" id="embedded-chat-input" placeholder="Posez votre question..." onkeydown="if(event.key==='Enter')sendEmbeddedChat()">
+            <button class="chatbot-send" onclick="sendEmbeddedChat()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END STUDENT -->
+
+    <!-- ============ TEACHER SPACE ============ -->
+    <div id="space-teacher" class="space" style="display:none">
+      <div class="welcome-strip">
+        <div>
+          <h2>Espace Enseignant 📋</h2>
+          <p>Dr. Rousseau — Machine Learning · Sorbonne Paris Nord</p>
+        </div>
+        <div class="welcome-strip-icon">📚</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('teacher','edt',this)">📅 Mon EDT</button>
+        <button class="tab-btn" onclick="switchTab('teacher','presence',this)">✅ One-Touch Présence</button>
+        <button class="tab-btn" onclick="switchTab('teacher','reporting',this)">📊 Reporting</button>
+        <button class="tab-btn" onclick="switchTab('teacher','associatif',this)">🤝 Associatif</button>
+        <button class="tab-btn" onclick="switchTab('teacher','bde',this)">🎉 BDE</button>
+        <button class="tab-btn" onclick="switchTab('teacher','culture',this)">🎭 Culturel</button>
+        <button class="tab-btn" onclick="switchTab('teacher','admin',this)">📢 Administratif</button>
+      </div>
+
+      <!-- EDT -->
+      <div id="teacher-edt" class="tab-content active">
+        <div class="section-header"><div class="section-title">Mes cours — Semaine en cours</div></div>
+        <div>
+          <div class="week-header">Lundi 23 mars</div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#1B2D6B"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">08h00 – 10h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Machine Learning — CM</div>
+                <div class="schedule-sub">Amphi A · L3 Big Data · 45 inscrits</div>
+              </div>
+              <button class="btn-sm green">✅ Présence faite</button>
+            </div>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#E8581A"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">14h00 – 16h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Machine Learning — TD</div>
+                <div class="schedule-sub">Salle B204 · Groupe A · 22 inscrits</div>
+              </div>
+              <button class="btn-sm navy">📋 Faire la présence</button>
+            </div>
+          </div>
+          <div class="week-header">Mercredi 25 mars</div>
+          <div class="schedule-item">
+            <div class="schedule-side" style="background:#1DA062"></div>
+            <div class="schedule-body">
+              <div class="schedule-time">10h00 – 12h00</div>
+              <div class="schedule-info">
+                <div class="schedule-name">Deep Learning — CM</div>
+                <div class="schedule-sub">Amphi B · M1 IA · 38 inscrits</div>
+              </div>
+              <span class="status pending">À venir</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Présence One-Touch -->
+      <div id="teacher-presence" class="tab-content">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Sélection du cours</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <select style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.82rem;flex:1;min-width:160px"><option>Machine Learning — TD · Groupe A</option><option>Machine Learning — CM · L3</option><option>Deep Learning — CM · M1</option></select>
+            <input type="date" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.82rem;flex:1;min-width:140px" value="2026-03-23">
+            <button class="btn-sm navy" onclick="buildAttTable()">Charger</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Liste d'appel — Machine Learning TD · 23/03/2026</div>
+          <table class="att-table">
+            <thead><tr><th>Étudiant·e</th><th>Groupe</th><th>Statut</th></tr></thead>
+            <tbody id="att-body"></tbody>
+          </table>
+          <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+            <button class="btn-sm" onclick="alert('📊 Récapitulatif : 6P / 2A / 0R')">Récapitulatif</button>
+            <button class="btn-sm navy" onclick="alert('✅ Présences enregistrées avec succès !')">Valider les présences</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reporting -->
+      <div id="teacher-reporting" class="tab-content">
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div><div class="stat-val">81%</div><div class="stat-lbl">Taux présence moyen</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">⚠️</div>
+            <div><div class="stat-val">3</div><div class="stat-lbl">Étudiants < 75%</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon navy">📅</div>
+            <div><div class="stat-val">18</div><div class="stat-lbl">Séances ce semestre</div></div>
+          </div>
+        </div>
+        <div class="alert-banner">
+          <span class="alert-icon">🚨</span>
+          <div class="alert-text">Alerte — <span>3 étudiant·e·s sont en dessous du seuil de 75% de présence.</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Suivi individuel</div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--red-bg)">⚠️</div>
+            <div class="list-info">
+              <div class="list-name">Yilmaz Ahmet</div>
+              <div class="list-sub">Big Data · 3 absences sur 10 séances</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:70%;background:var(--red)"></div></div>
+            </div>
+            <div class="list-meta" style="color:var(--red);font-weight:700">70%</div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--yellow-bg)">⚡</div>
+            <div class="list-info">
+              <div class="list-name">Hernandez Luis</div>
+              <div class="list-sub">Big Data · 2 absences + 1 retard</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:73%;background:var(--yellow)"></div></div>
+            </div>
+            <div class="list-meta" style="color:var(--yellow);font-weight:700">73%</div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--yellow-bg)">⚡</div>
+            <div class="list-info">
+              <div class="list-name">Benali Karima</div>
+              <div class="list-sub">Big Data · 2 absences + 2 retards</div>
+              <div class="progress-bar" style="margin-top:6px"><div class="progress-fill" style="width:74%;background:var(--yellow)"></div></div>
+            </div>
+            <div class="list-meta" style="color:var(--yellow);font-weight:700">74%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Teacher shared tabs (Associatif, BDE, Culturel, Administratif) -->
+      <div id="teacher-associatif" class="tab-content">
+        <div class="section-header"><div class="section-title">Vie associative</div></div>
+        <div class="grid-3">
+          <div class="event-card"><div class="event-cover cover-asso">🤝</div><div class="event-body"><span class="event-tag tag-asso">Association</span><div class="event-name">Forum des associations</div><div class="event-meta">📅 25 mars · 12h–18h · Hall</div></div></div>
+          <div class="event-card"><div class="event-cover cover-sport">🏸</div><div class="event-body"><span class="event-tag tag-sport">Sport</span><div class="event-name">Tournoi de Badminton</div><div class="event-meta">📅 28 mars · 14h–18h · Gymnase</div></div></div>
+        </div>
+      </div>
+      <div id="teacher-bde" class="tab-content">
+        <div class="section-header"><div class="section-title">Publications BDE</div></div>
+        <div class="grid-3">
+          <div class="event-card"><div class="event-cover cover-soiree">🎶</div><div class="event-body"><span class="event-tag tag-soiree">Soirée</span><div class="event-name">Soirée de Printemps BDE</div><div class="event-meta">📅 4 avr · 21h</div></div></div>
+          <div class="event-card"><div class="event-cover cover-bde">🧠</div><div class="event-body"><span class="event-tag tag-asso">Conférence</span><div class="event-name">Conférence : IA & Emploi</div><div class="event-meta">📅 2 avr · 14h · Amphi A</div></div></div>
+        </div>
+      </div>
+      <div id="teacher-culture" class="tab-content">
+        <div class="section-header"><div class="section-title">Culturel & Local</div></div>
+        <div class="grid-3">
+          <div class="event-card"><div class="event-cover cover-cinema">🎬</div><div class="event-body"><span class="event-tag tag-cinema">Cinéma</span><div class="event-name">Ciné-club Épinay</div><div class="event-meta">📅 Mercredis · 19h</div></div></div>
+          <div class="event-card"><div class="event-cover cover-expo">🎨</div><div class="event-body"><span class="event-tag tag-expo">Exposition</span><div class="event-name">Expo photo : Regards croisés</div><div class="event-meta">📅 1–15 avr · Médiathèque</div></div></div>
+        </div>
+      </div>
+      <div id="teacher-admin" class="tab-content">
+        <div class="card">
+          <div class="card-title">Informations administratives</div>
+          <div class="list-item">
+            <div class="list-icon" style="background:#EAF0FF">📋</div>
+            <div class="list-info">
+              <div class="list-name">Calendrier des jurys : dates publiées</div>
+              <div class="list-sub">Session juin 2026 · Voir intranet</div>
+            </div>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:var(--orange-bg)">📄</div>
+            <div class="list-info">
+              <div class="list-name">Saisie des notes — ouverture prochaine</div>
+              <div class="list-sub">Campagne du 15 au 30 juin via Apogée</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END TEACHER -->
+
+    <!-- ============ BDE SPACE ============ -->
+    <div id="space-bde" class="space" style="display:none">
+      <div class="welcome-strip">
+        <div>
+          <h2>Espace BDE 🎉</h2>
+          <p>Bureau Des Étudiants — Sorbonne Paris Nord</p>
+        </div>
+        <div class="welcome-strip-icon">🎓</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('bde','publications',this)">📢 Publications</button>
+        <button class="tab-btn" onclick="switchTab('bde','moderation',this)">🔍 Modération</button>
+        <button class="tab-btn" onclick="switchTab('bde','collaboration',this)">🤝 Collaboration</button>
+      </div>
+
+      <!-- Publications -->
+      <div id="bde-publications" class="tab-content active">
+        <div class="grid-2">
+          <div class="form-section">
+            <div class="section-title" style="margin-bottom:16px">Créer une publication</div>
+            <div class="field"><label>Titre</label><input type="text" placeholder="Ex: Soirée de rentrée BDE"></div>
+            <div class="field"><label>Type</label><select><option>Événement</option><option>Annonce</option><option>Appel à bénévoles</option></select></div>
+            <div class="field"><label>Description</label><textarea placeholder="Décrivez votre publication..."></textarea></div>
+            <div class="field"><label>Date et heure</label><input type="datetime-local"></div>
+            <div class="field"><label>Lieu</label><input type="text" placeholder="Ex: Amphi A, Campus Villetaneuse"></div>
+            <div class="field"><label>Visuel</label><div class="upload-area"><div class="icon">🖼️</div><strong>Glissez ou cliquez pour ajouter</strong></div></div>
+            <button class="btn-full orange" onclick="alert('✅ Publication créée et diffusée !')">Publier</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Dernières publications</div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--orange-bg)">🎶</div>
+              <div class="list-info"><div class="list-name">Soirée de Printemps</div><div class="list-sub">Événement · 4 avr · Publié</div></div>
+              <span class="status validated">Live</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:#EAF0FF">🧠</div>
+              <div class="list-info"><div class="list-name">Conférence IA & Emploi</div><div class="list-sub">Conférence · 2 avr · Publié</div></div>
+              <span class="status validated">Live</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--green-bg)">☀️</div>
+              <div class="list-info"><div class="list-name">Journée cohésion</div><div class="list-sub">Campus · 8 avr · Publié</div></div>
+              <span class="status validated">Live</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modération -->
+      <div id="bde-moderation" class="tab-content">
+        <div class="card">
+          <div class="card-title">Contenus en attente de validation</div>
+          <div class="mod-item">
+            <div class="mod-emoji">🏃</div>
+            <div class="mod-info"><div class="mod-name">Yoga du matin — Asso Bien-être</div><div class="mod-sub">Association · Soumis le 20/03</div></div>
+            <div class="mod-actions">
+              <button class="btn-validate" onclick="validateContent(this)">✓ Valider</button>
+              <button class="btn-refuse" onclick="refuseContent(this)">✗ Refuser</button>
+            </div>
+          </div>
+          <div class="mod-item">
+            <div class="mod-emoji">🎨</div>
+            <div class="mod-info"><div class="mod-name">Atelier peinture — Asso Arts</div><div class="mod-sub">Association · Soumis le 19/03</div></div>
+            <div class="mod-actions">
+              <button class="btn-validate" onclick="validateContent(this)">✓ Valider</button>
+              <button class="btn-refuse" onclick="refuseContent(this)">✗ Refuser</button>
+            </div>
+          </div>
+          <div class="mod-item">
+            <div class="mod-emoji">🍕</div>
+            <div class="mod-info"><div class="mod-name">Repas international — Asso Internationale</div><div class="mod-sub">Association · Soumis le 18/03</div></div>
+            <div class="mod-actions">
+              <button class="btn-validate" onclick="validateContent(this)">✓ Valider</button>
+              <button class="btn-refuse" onclick="refuseContent(this)">✗ Refuser</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collaboration -->
+      <div id="bde-collaboration" class="tab-content">
+        <div class="grid-2">
+          <div class="form-section">
+            <div class="section-title" style="margin-bottom:16px">Co-publication avec l'administration</div>
+            <div class="field"><label>Titre</label><input type="text" placeholder="Titre de l'annonce conjointe"></div>
+            <div class="field"><label>Destinataire</label><select><option>Administration générale</option><option>Service scolarité</option><option>DSI</option></select></div>
+            <div class="field">
+              <label>Contenu</label>
+              <textarea placeholder="Rédigez ici le message conjoint..."></textarea>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-full" onclick="alert('📨 Annonce envoyée à l\'administration pour validation.')">Soumettre à validation</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Annonces conjointes récentes</div>
+            <div class="list-item">
+              <div class="list-icon" style="background:#EAF0FF">📢</div>
+              <div class="list-info">
+                <div class="list-name">Travaux bibliothèque — Fermeture exceptionnelle</div>
+                <div class="list-sub">BDE + Administration · Validé le 19/03</div>
+              </div>
+              <span class="status validated">Diffusé</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--yellow-bg)">🔧</div>
+              <div class="list-info">
+                <div class="list-name">Maintenance réseau Wi-Fi</div>
+                <div class="list-sub">BDE + DSI · En attente validation</div>
+              </div>
+              <span class="status pending">En attente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END BDE -->
+
+    <!-- ============ ASSOCIATION SPACE ============ -->
+    <div id="space-asso" class="space" style="display:none">
+      <div class="welcome-strip">
+        <div>
+          <h2>Espace Association 🤝</h2>
+          <p>Association Bien-être & Sport — Sorbonne Paris Nord</p>
+        </div>
+        <div class="welcome-strip-icon">🌱</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('asso','profil',this)">🏷️ Profil associatif</button>
+        <button class="tab-btn" onclick="switchTab('asso','evenement',this)">🗓️ Créer un événement</button>
+        <button class="tab-btn" onclick="switchTab('asso','recrutement',this)">📣 Recrutement & Bénévolat</button>
+      </div>
+
+      <!-- Profil -->
+      <div id="asso-profil" class="tab-content active">
+        <div class="grid-2">
+          <div class="form-section">
+            <div class="section-title" style="margin-bottom:16px">Fiche de présentation</div>
+            <div class="field"><label>Nom de l'association</label><input type="text" value="Association Bien-être & Sport"></div>
+            <div class="field"><label>Description</label><textarea>Association étudiante proposant des activités sportives et de bien-être au sein du campus de Sorbonne Paris Nord : yoga, randonnée, méditation...</textarea></div>
+            <div class="field"><label>Catégorie</label><select><option>Sport & Bien-être</option><option>Culture & Arts</option><option>Solidarité</option><option>Autre</option></select></div>
+            <div class="field"><label>Modalités d'adhésion</label><input type="text" value="5€/an · Inscription en présentiel salle B012"></div>
+            <div class="field"><label>Réseaux sociaux</label><input type="text" placeholder="@asso_bienetre_spn" value="@bienetre_spn"></div>
+            <div class="field"><label>Logo</label><div class="upload-area"><div class="icon">🖼️</div><strong>Mettre à jour le logo</strong></div></div>
+            <button class="btn-full" onclick="alert('✅ Profil mis à jour !')">Enregistrer</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Aperçu public</div>
+            <div style="text-align:center;padding:16px 0">
+              <div style="width:72px;height:72px;background:linear-gradient(135deg,#1B2D6B,#E8581A);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 12px">🌱</div>
+              <div style="font-weight:700;font-size:1.1rem;color:var(--navy)">Bien-être & Sport</div>
+              <div style="font-size:.8rem;color:var(--text-2);margin:6px 0 14px">Sport & Bien-être · @bienetre_spn</div>
+              <span class="status validated">Association agréée</span>
+            </div>
+            <div class="list-item">
+              <div style="font-size:.8rem;color:var(--text-2)">Membres actifs</div>
+              <div style="font-size:.88rem;font-weight:600;color:var(--navy);margin-left:auto">47</div>
+            </div>
+            <div class="list-item">
+              <div style="font-size:.8rem;color:var(--text-2)">Événements publiés</div>
+              <div style="font-size:.88rem;font-weight:600;color:var(--navy);margin-left:auto">8</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Événement -->
+      <div id="asso-evenement" class="tab-content">
+        <div class="grid-2">
+          <div class="form-section">
+            <div class="section-title" style="margin-bottom:16px">Soumettre un événement</div>
+            <div class="field"><label>Titre</label><input type="text" placeholder="Ex: Yoga du matin"></div>
+            <div class="field"><label>Description</label><textarea placeholder="Présentez votre événement..."></textarea></div>
+            <div class="field"><label>Date et heure</label><input type="datetime-local"></div>
+            <div class="field"><label>Lieu</label><input type="text" placeholder="Sur campus ou hors campus ?"></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:10px 14px;background:var(--yellow-bg);border-radius:8px;font-size:.8rem;color:var(--yellow)">
+              ℹ️ <span>Si votre événement se déroule hors campus, il sera automatiquement affiché dans l'onglet <strong>Culturel & Local</strong>.</span>
+            </div>
+            <div class="field"><label>Visuel</label><div class="upload-area"><div class="icon">🖼️</div><strong>Ajouter une affiche</strong></div></div>
+            <button class="btn-full orange" onclick="alert('📨 Événement soumis au BDE pour validation !')">Soumettre au BDE</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Statut des soumissions</div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--green-bg)">🏃</div>
+              <div class="list-info"><div class="list-name">Yoga du matin</div><div class="list-sub">Soumis le 20/03</div></div>
+              <span class="status pending">En attente BDE</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--green-bg)">🚵</div>
+              <div class="list-info"><div class="list-name">Sortie vélo Épinay</div><div class="list-sub">Soumis le 15/03</div></div>
+              <span class="status validated">Validé</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--red-bg)">🧘</div>
+              <div class="list-info"><div class="list-name">Retraite méditation</div><div class="list-sub">Soumis le 10/03</div></div>
+              <span class="status refused">Refusé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recrutement -->
+      <div id="asso-recrutement" class="tab-content">
+        <div class="grid-2">
+          <div class="form-section">
+            <div class="section-title" style="margin-bottom:16px">Publier une offre</div>
+            <div class="field"><label>Type d'offre</label><select><option>Bénévolat ponctuel</option><option>Recrutement membre</option><option>Mission longue durée</option></select></div>
+            <div class="field"><label>Intitulé du poste</label><input type="text" placeholder="Ex: Responsable communication"></div>
+            <div class="field"><label>Description de la mission</label><textarea placeholder="Décrivez les responsabilités, les compétences souhaitées..."></textarea></div>
+            <div class="field"><label>Contact</label><input type="email" placeholder="contact@asso-bienetre.fr"></div>
+            <button class="btn-full orange" onclick="alert('📨 Offre soumise au BDE pour validation !')">Soumettre</button>
+          </div>
+          <div class="card">
+            <div class="card-title">Offres publiées</div>
+            <div class="list-item">
+              <div class="list-icon" style="background:var(--yellow-bg)">📸</div>
+              <div class="list-info"><div class="list-name">Photographe bénévole</div><div class="list-sub">Événements · Bénévolat · Validé</div></div>
+              <span class="status validated">Live</span>
+            </div>
+            <div class="list-item">
+              <div class="list-icon" style="background:#EAF0FF">💻</div>
+              <div class="list-info"><div class="list-name">Responsable réseaux sociaux</div><div class="list-sub">Recrutement · En attente</div></div>
+              <span class="status pending">En attente</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END ASSO -->
+
+    <!-- ============ ADMIN SPACE ============ -->
+    <div id="space-admin" class="space" style="display:none">
+      <div class="welcome-strip">
+        <div>
+          <h2>Back-Office Administration 🔒</h2>
+          <p>Supervision globale — Sorbonne Paris Nord</p>
+        </div>
+        <div class="welcome-strip-icon">🏛️</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('admin','overview',this)">📊 Vue globale</button>
+        <button class="tab-btn" onclick="switchTab('admin','presences',this)">✅ Gestion présences</button>
+        <button class="tab-btn" onclick="switchTab('admin','contenus',this)">📝 Gestion contenus</button>
+        <button class="tab-btn" onclick="switchTab('admin','rapports',this)">📑 Rapports</button>
+      </div>
+
+      <!-- Overview -->
+      <div id="admin-overview" class="tab-content active">
+        <div class="grid-3" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div><div class="stat-val">78%</div><div class="stat-lbl">Taux de présence global</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">⚠️</div>
+            <div><div class="stat-val">23</div><div class="stat-lbl">Étudiants en décrochage (&lt;75%)</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">📢</div>
+            <div><div class="stat-val">12</div><div class="stat-lbl">Publications en attente</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon navy">👥</div>
+            <div><div class="stat-val" id="admin-students">1 847</div><div class="stat-lbl">Étudiants actifs</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🤖</div>
+            <div><div class="stat-val" id="admin-chatbot-rate">91%</div><div class="stat-lbl">Taux résolution chatbot</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon navy">📅</div>
+            <div><div class="stat-val">342</div><div class="stat-lbl">Cours ce semestre</div></div>
+          </div>
+        </div>
+
+        <div class="alert-banner">
+          <span class="alert-icon">🚨</span>
+          <div class="alert-text">Alerte décrochage — <span>23 étudiants ont un taux de présence inférieur à 75% sur les 3 dernières semaines. Notifications tuteurs envoyées automatiquement.</span></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Taux de présence par UFR</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+            <div><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span style="font-weight:600">Sciences & Technologies</span><span style="color:var(--green)">82%</span></div><div class="progress-bar"><div class="progress-fill" style="width:82%;background:var(--green)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span style="font-weight:600">Lettres & Sciences Humaines</span><span style="color:var(--green)">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%;background:var(--green)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span style="font-weight:600">Droit & Sciences Politiques</span><span style="color:var(--yellow)">71%</span></div><div class="progress-bar"><div class="progress-fill" style="width:71%;background:var(--yellow)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:4px"><span style="font-weight:600">Sciences Économiques</span><span style="color:var(--red)">64%</span></div><div class="progress-bar"><div class="progress-fill" style="width:64%;background:var(--red)"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Présences admin -->
+      <div id="admin-presences" class="tab-content">
+        <div class="card">
+          <div class="card-title">Modification de présence (accès illimité)</div>
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+            <select style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.82rem;flex:1;min-width:160px"><option>Tous les cours</option><option>Machine Learning</option><option>Deep Learning</option><option>Algorithmique</option></select>
+            <input type="date" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.82rem;flex:1;min-width:140px">
+            <button class="btn-sm navy">Rechercher</button>
+          </div>
+          <table class="att-table">
+            <thead><tr><th>Étudiant·e</th><th>Cours</th><th>Date</th><th>Statut actuel</th><th>Modifier</th></tr></thead>
+            <tbody>
+              <tr><td>Yilmaz Ahmet</td><td>Machine Learning</td><td>16/03/2026</td><td><span class="status absent">Absent</span></td><td><button class="btn-edit" onclick="alert('✅ Statut modifié')">Modifier</button></td></tr>
+              <tr><td>Hernandez Luis</td><td>Machine Learning</td><td>09/03/2026</td><td><span class="status absent">Absent</span></td><td><button class="btn-edit" onclick="alert('✅ Statut modifié')">Modifier</button></td></tr>
+              <tr><td>Benali Karima</td><td>Deep Learning</td><td>11/03/2026</td><td><span class="status late">Retard</span></td><td><button class="btn-edit" onclick="alert('✅ Statut modifié')">Modifier</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Contenus -->
+      <div id="admin-contenus" class="tab-content">
+        <div class="card">
+          <div class="card-title">Tous les contenus publiés</div>
+          <div class="admin-row">
+            <div class="mod-emoji">🎶</div>
+            <div class="admin-info"><div class="admin-name">Soirée de Printemps BDE</div><div class="admin-meta">BDE · Publié le 18/03 · 4 avr</div></div>
+            <span class="status validated">Live</span>
+            <button class="btn-danger" onclick="confirmDelete(this)">Supprimer</button>
+          </div>
+          <div class="admin-row">
+            <div class="mod-emoji">🎨</div>
+            <div class="admin-info"><div class="admin-name">Atelier peinture — Asso Arts</div><div class="admin-meta">Association · Publié le 21/03 · 2 avr</div></div>
+            <span class="status validated">Live</span>
+            <button class="btn-danger" onclick="confirmDelete(this)">Supprimer</button>
+          </div>
+          <div class="admin-row">
+            <div class="mod-emoji">🏃</div>
+            <div class="admin-info"><div class="admin-name">Yoga du matin — Asso Bien-être</div><div class="admin-meta">Association · En attente de validation</div></div>
+            <span class="status pending">En attente</span>
+            <button class="btn-validate" onclick="validateContent(this)">✓ Valider</button>
+            <button class="btn-refuse" onclick="refuseContent(this)">✗ Refuser</button>
+          </div>
+          <div class="admin-row">
+            <div class="mod-emoji">🍕</div>
+            <div class="admin-info"><div class="admin-name">Repas international — Asso Internationale</div><div class="admin-meta">Association · En attente de validation</div></div>
+            <span class="status pending">En attente</span>
+            <button class="btn-validate" onclick="validateContent(this)">✓ Valider</button>
+            <button class="btn-refuse" onclick="refuseContent(this)">✗ Refuser</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rapports -->
+      <div id="admin-rapports" class="tab-content">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Générer un rapport d'assiduité</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+            <div class="field" style="flex:1;min-width:160px;margin:0">
+              <label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Critère</label>
+              <select style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.85rem">
+                <option>Par promotion</option><option>Par étudiant</option><option>Par matière</option><option>Par UFR</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;min-width:160px;margin:0">
+              <label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Période</label>
+              <select style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.85rem">
+                <option>Semestre en cours</option><option>Dernier mois</option><option>Dernière semaine</option><option>Personnalisée</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;min-width:160px;margin:0">
+              <label style="font-size:.8rem;font-weight:600;color:var(--navy);display:block;margin-bottom:6px">Format</label>
+              <select style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:Outfit,sans-serif;font-size:.85rem">
+                <option>PDF</option><option>Excel (.xlsx)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-sm navy" onclick="alert('📊 Rapport généré ! Téléchargement en cours...')">Générer le rapport</button>
+            <button class="btn-sm" onclick="alert('📧 Rapport envoyé aux responsables de formation.')">Envoyer par e-mail</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Rapports générés récemment</div>
+          <div class="list-item">
+            <div class="list-icon" style="background:#EAF0FF">📑</div>
+            <div class="list-info"><div class="list-name">Rapport hebdomadaire — Semaine 11</div><div class="list-sub">Lundi 17 mars 2026 · 8h00 · PDF · 23 pages</div></div>
+            <button class="btn-sm navy">Télécharger</button>
+          </div>
+          <div class="list-item">
+            <div class="list-icon" style="background:#E8F7F0">📊</div>
+            <div class="list-info"><div class="list-name">Bilan mensuel — Février 2026</div><div class="list-sub">1 mars 2026 · Excel · 5 onglets</div></div>
+            <button class="btn-sm navy">Télécharger</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END ADMIN -->
+
+  </div><!-- end content-area -->
+
+  <!-- CHATBOT FAB -->
+  <div class="chatbot-fab" id="chatbot-fab" style="display:none" onclick="toggleChatbot()" title="Assistant IA">💬</div>
+
+  <div class="chatbot-panel" id="chatbot-panel">
+    <div class="chatbot-header">
+      <span style="font-size:1.4rem">🤖</span>
+      <div class="chatbot-header-info">
+        <h4>Assistant Campus Connect</h4>
+        <p>Réponse IA · Django Backend</p>
+      </div>
+      <span style="margin-left:auto;cursor:pointer;font-size:1.1rem;opacity:.7" onclick="toggleChatbot()">✕</span>
+    </div>
+    <div class="chatbot-messages" id="chatbot-msgs">
+      <div class="chat-msg bot">Bonjour ! Je suis votre assistant Campus Connect. Comment puis-je vous aider aujourd'hui ? 👋</div>
+      <div class="chat-msg bot">Vous pouvez me poser des questions sur les procédures administratives, les bourses, les inscriptions ou l'emploi du temps.</div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" id="chat-input" placeholder="Posez votre question..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chatbot-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+
+</div><!-- end app-view -->
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+// ─── CSRF Token ──────────────────────────────────────────────────────────────
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+const ACCOUNTS = [
+  { email:'jean.dupont@etu.sorbonne.fr',  password:'etudiant123',   role:'student', name:'Jean Dupont',    initials:'JD', roleLabel:'Étudiant·e Master Big Data' },
+  { email:'sophie.martin@etu.sorbonne.fr',password:'etudiant456',   role:'student', name:'Sophie Martin',  initials:'SM', roleLabel:'Étudiante L3 Informatique' },
+  { email:'ahmet.yilmaz@etu.sorbonne.fr', password:'etudiant789',   role:'student', name:'Ahmet Yilmaz',   initials:'AY', roleLabel:'Étudiant Master Big Data' },
+  { email:'m.rousseau@sorbonne.fr',       password:'enseignant123', role:'teacher', name:'Dr. Rousseau',   initials:'MR', roleLabel:'Enseignante · Machine Learning' },
+  { email:'p.laurent@sorbonne.fr',        password:'enseignant456', role:'teacher', name:'M. Laurent',     initials:'PL', roleLabel:'Enseignant · Algorithmique' },
+  { email:'lea.martin@etu.sorbonne.fr',   password:'bde123',        role:'bde',     name:'Léa Martin',     initials:'LM', roleLabel:'Présidente BDE' },
+  { email:'kevin.tran@etu.sorbonne.fr',   password:'asso123',       role:'asso',    name:'Kevin Tran',     initials:'KT', roleLabel:'Bureau — Asso Bien-être' },
+  { email:'admin@sorbonne.fr',            password:'admin123',      role:'admin',   name:'Admin. Centrale',initials:'AC', roleLabel:'Accès Back-Office complet' },
+];
+
+const BADGE_LABELS = {
+  student:'Étudiant',teacher:'Enseignant',bde:'BDE',asso:'Association',admin:'Admin'
+};
+
+const ATT_STUDENTS = [
+  {name:'Dupont Jean',       group:'Big Data'}, {name:'Martin Sophie',   group:'Big Data'},
+  {name:'Yilmaz Ahmet',      group:'Big Data'}, {name:'Benali Karima',   group:'Big Data'},
+  {name:'Hernandez Luis',    group:'Big Data'}, {name:'Leroy Emma',      group:'Big Data'},
+  {name:'Nguyen Thanh',      group:'Big Data'}, {name:'Dubois Paul',     group:'Big Data'},
+];
+
+let currentRole = null;
+let currentUser = null;
+
+// ─── Login with credentials ──────────────────────────────────────────────────
+function fillLogin(email, pwd) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = pwd;
+  document.getElementById('login-error').classList.remove('show');
+}
+
+function handleLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pwd = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const errMsg = document.getElementById('login-error-msg');
+
+  if (!email || !pwd) {
+    errMsg.textContent = 'Veuillez remplir tous les champs.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const account = ACCOUNTS.find(a => a.email === email && a.password === pwd);
+  if (!account) {
+    errMsg.textContent = 'E-mail ou mot de passe incorrect.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  errEl.classList.remove('show');
+  currentUser = account;
+  loginAs(account.role, account);
+}
+
+function loginAs(role, account) {
+  currentRole = role;
+  const u = account || ACCOUNTS.find(a => a.role === role);
+  document.getElementById('login-view').classList.remove('active');
+  const appView = document.getElementById('app-view');
+  appView.classList.add('active');
+
+  document.getElementById('topbar-avatar').textContent = u.initials;
+  document.getElementById('topbar-name').textContent   = u.name;
+  document.getElementById('topbar-role').textContent   = u.roleLabel;
+  const badge = document.getElementById('topbar-badge');
+  badge.textContent = BADGE_LABELS[role];
+  badge.className = 'topbar-badge badge-' + role;
+
+  document.querySelectorAll('.space').forEach(s => s.style.display = 'none');
+  document.getElementById('space-' + role).style.display = 'block';
+
+  // chatbot fab visible for student and admin
+  document.getElementById('chatbot-fab').style.display = (role === 'student' || role === 'admin') ? 'flex' : 'none';
+
+  if (role === 'teacher') buildAttTable();
+
+  // Load chatbot stats for admin
+  if (role === 'admin') loadChatbotStats();
+}
+
+function logout() {
+  currentRole = null;
+  document.getElementById('app-view').classList.remove('active');
+  document.getElementById('login-view').classList.add('active');
+  document.querySelectorAll('.space').forEach(s => s.style.display = 'none');
+  document.getElementById('chatbot-panel').classList.remove('open');
+}
+
+// ─── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(space, tab, btn) {
+  const prefix = space + '-';
+  document.querySelectorAll('[id^="' + prefix + '"]').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById(prefix + tab);
+  if (target) target.classList.add('active');
+
+  const navBtns = btn.closest('.tab-nav').querySelectorAll('.tab-btn');
+  navBtns.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── Attendance table ─────────────────────────────────────────────────────────
+function buildAttTable() {
+  const tbody = document.getElementById('att-body');
+  if (!tbody) return;
+  const statuses = ['p','p','a','p','r','p','p','a'];
+  tbody.innerHTML = ATT_STUDENTS.map((s, i) => {
+    const curr = statuses[i];
+    return '<tr>' +
+      '<td style="font-weight:600">' + s.name + '</td>' +
+      '<td>' + s.group + '</td>' +
+      '<td><div class="toggle-status">' +
+        '<button class="ts-btn p ' + (curr==='p'?'active':'') + '" onclick="setStatus(this,\'p\')">P</button>' +
+        '<button class="ts-btn a ' + (curr==='a'?'active':'') + '" onclick="setStatus(this,\'a\')">A</button>' +
+        '<button class="ts-btn r ' + (curr==='r'?'active':'') + '" onclick="setStatus(this,\'r\')">R</button>' +
+      '</div></td></tr>';
+  }).join('');
+}
+
+function setStatus(btn, st) {
+  const row = btn.closest('.toggle-status');
+  row.querySelectorAll('.ts-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ─── Moderation actions ───────────────────────────────────────────────────────
+function validateContent(btn) {
+  const row = btn.closest('.mod-item, .admin-row');
+  const btns = row.querySelectorAll('.btn-validate,.btn-refuse,.btn-danger');
+  btns.forEach(b => b.style.display='none');
+  const badge = document.createElement('span');
+  badge.className = 'status validated';
+  badge.textContent = '✓ Validé';
+  row.appendChild(badge);
+}
+
+function refuseContent(btn) {
+  const row = btn.closest('.mod-item, .admin-row');
+  const btns = row.querySelectorAll('.btn-validate,.btn-refuse,.btn-danger');
+  btns.forEach(b => b.style.display='none');
+  const badge = document.createElement('span');
+  badge.className = 'status refused';
+  badge.textContent = '✗ Refusé';
+  row.appendChild(badge);
+}
+
+function confirmDelete(btn) {
+  if(confirm('Supprimer ce contenu définitivement ?')) {
+    btn.closest('.admin-row').style.opacity = '0.3';
+    btn.closest('.admin-row').style.pointerEvents = 'none';
+  }
+}
+
+// ─── Chatbot (connected to Django API) ────────────────────────────────────────
+function toggleChatbot() {
+  const panel = document.getElementById('chatbot-panel');
+  panel.classList.toggle('open');
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msgs = document.getElementById('chatbot-msgs');
+  const text = input.value.trim();
+  if(!text) return;
+
+  // user message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = text;
+  msgs.appendChild(userMsg);
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg bot typing';
+  typing.textContent = 'En train de réfléchir...';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Call Django chatbot API
+  fetch('/api/send/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ message: text })
+  })
+  .then(r => r.json())
+  .then(data => {
+    typing.remove();
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    botMsg.textContent = data.reponse;
+    msgs.appendChild(botMsg);
+
+    // If there's a link, show it
+    if (data.lien) {
+      const linkMsg = document.createElement('div');
+      linkMsg.className = 'chat-msg bot';
+      linkMsg.innerHTML = '🔗 <a href="' + data.lien + '" target="_blank" style="color:var(--navy);text-decoration:underline">En savoir plus</a>';
+      msgs.appendChild(linkMsg);
+    }
+
+    msgs.scrollTop = msgs.scrollHeight;
+  })
+  .catch(() => {
+    typing.remove();
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg bot';
+    errMsg.textContent = 'Désolé, une erreur est survenue. Veuillez réessayer.';
+    msgs.appendChild(errMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  });
+}
+
+// ─── Embedded chatbot in student tab ──────────────────────────────────────────
+function quickChat(text) {
+  document.getElementById('embedded-chat-input').value = text;
+  sendEmbeddedChat();
+}
+
+function sendEmbeddedChat() {
+  const input = document.getElementById('embedded-chat-input');
+  const msgs = document.getElementById('embedded-chatbot-msgs');
+  const text = input.value.trim();
+  if(!text) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = text;
+  msgs.appendChild(userMsg);
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  const typing = document.createElement('div');
+  typing.className = 'chat-msg bot typing';
+  typing.textContent = 'En train de réfléchir...';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  fetch('/api/send/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ message: text })
+  })
+  .then(r => r.json())
+  .then(data => {
+    typing.remove();
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    botMsg.textContent = data.reponse;
+    msgs.appendChild(botMsg);
+    if (data.lien) {
+      const linkMsg = document.createElement('div');
+      linkMsg.className = 'chat-msg bot';
+      linkMsg.innerHTML = '🔗 <a href="' + data.lien + '" target="_blank" style="color:var(--navy);text-decoration:underline">En savoir plus</a>';
+      msgs.appendChild(linkMsg);
+    }
+    msgs.scrollTop = msgs.scrollHeight;
+  })
+  .catch(() => {
+    typing.remove();
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg bot';
+    errMsg.textContent = 'Désolé, une erreur est survenue. Veuillez réessayer.';
+    msgs.appendChild(errMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+  });
+}
+
+// ─── Load chatbot stats in admin dashboard ────────────────────────────────────
+function loadChatbotStats() {
+  fetch('/api/stats/')
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('admin-chatbot-rate');
+      if (el && data.rate !== undefined) {
+        el.textContent = data.rate + '%';
+      }
+    })
+    .catch(() => {});
+}
+</script>
+</body>
+</html>
